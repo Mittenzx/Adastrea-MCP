@@ -30,10 +30,12 @@ export interface GameProject {
 
 export class GameProjectStorage {
   private dataFile: string;
+  private defaultDataFile: string;
 
   constructor(dataFile?: string) {
     // Store data file in the package root directory
     this.dataFile = dataFile || path.join(__dirname, "..", "game-project-data.json");
+    this.defaultDataFile = path.join(__dirname, "..", "adastrea-project-info.json");
   }
 
   async getProject(): Promise<GameProject> {
@@ -41,8 +43,17 @@ export class GameProjectStorage {
       const data = await fs.readFile(this.dataFile, "utf-8");
       return JSON.parse(data);
     } catch (error) {
-      // Return empty object if file doesn't exist
-      return {};
+      // If the main file doesn't exist, try to load from the default Adastrea project file
+      try {
+        const defaultData = await fs.readFile(this.defaultDataFile, "utf-8");
+        const project = JSON.parse(defaultData);
+        // Save it as the current project data for future reads
+        await this.saveProject(project);
+        return project;
+      } catch (defaultError) {
+        // Return empty object if neither file exists
+        return {};
+      }
     }
   }
 

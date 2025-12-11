@@ -8,6 +8,15 @@ This MCP server is specifically designed for the Adastrea game project, providin
 
 **Game Repository:** https://github.com/Mittenzx/Adastrea
 
+**Pre-populated Project Data:** The MCP server comes with comprehensive information about the Adastrea project already loaded, including:
+- Complete game description and features (22 major systems)
+- Technical details (33,000+ lines of C++ code)
+- Development timeline and milestones
+- Python automation tools and YAML templates
+- Current project status (Alpha phase, code 85% complete)
+
+The pre-populated data ensures AI agents have immediate context about Adastrea without manual configuration.
+
 ## Features
 
 - **Centralized Game Project Information**: Store all details about your game project in one place

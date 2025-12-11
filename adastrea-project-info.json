@@ -1,0 +1,105 @@
+{
+  "name": "Adastrea",
+  "description": "An open-world space flight game built on Unreal Engine 5.6. Players can explore vast galaxies, engage in thrilling space battles, discover new planets, manage space stations, build crew relationships, and participate in a dynamic galactic economy. The project features 22 major game systems with over 33,000 lines of C++ code and comprehensive Blueprint integration.",
+  "genre": "Space Simulation RPG",
+  "platform": ["PC", "Console"],
+  "engine": "Unreal Engine 5.6",
+  "status": "In Development - Alpha 1.0.0-alpha",
+  "repository_url": "https://github.com/Mittenzx/Adastrea",
+  "team": [
+    {
+      "name": "Mittenzx",
+      "role": "Lead Developer"
+    }
+  ],
+  "features": [
+    "Open-world space exploration",
+    "Dynamic combat system with 6 weapon types",
+    "Data-driven spaceship specification system (FloatingPawnMovement)",
+    "Modular space station construction",
+    "Faction system with diplomacy and reputation",
+    "Way System - Specialized guilds and micro-alliances",
+    "Personnel/crew management with 31 role types",
+    "AI system for faction and personnel behaviors",
+    "Trading economy system",
+    "Quest system with 10 quest types",
+    "Enhanced Input System with 30+ actions",
+    "Save/load system with multiple slots",
+    "Tutorial system with interactive guides",
+    "Audio system with dynamic music",
+    "Player progression and leveling",
+    "Complete UI systems (HUD, inventory, trading, etc.)",
+    "Map system for universe navigation",
+    "Procedural content generation",
+    "Automated testing framework"
+  ],
+  "technical_details": {
+    "architecture": "22 major game systems, modular C++ architecture",
+    "code_stats": "33,000+ lines of C++ code",
+    "design_approach": "Data-driven with Blueprint Data Assets",
+    "editor_friendly": "Blueprint-first design, minimal C++ knowledge required",
+    "testing": "Comprehensive automated testing with smoke tests and screenshot tests",
+    "ci_cd": "GitHub Actions with Docker support",
+    "python_automation": "Extensive Python scripts for scene population and content generation"
+  },
+  "timeline": {
+    "started": "2024",
+    "estimated_completion": "2026",
+    "milestones": [
+      {
+        "name": "Phase 1 - Foundation",
+        "date": "2024",
+        "status": "Completed"
+      },
+      {
+        "name": "Phase 2 - Core Systems",
+        "date": "2024",
+        "status": "Completed"
+      },
+      {
+        "name": "Phase 3 - Integration",
+        "date": "2025",
+        "status": "Completed"
+      },
+      {
+        "name": "Phase 4 - Gameplay & Polish",
+        "date": "2025",
+        "status": "In Progress"
+      },
+      {
+        "name": "Phase 5 - Content & Beta",
+        "date": "2026",
+        "status": "Planned"
+      }
+    ]
+  },
+  "custom_fields": {
+    "license": "MIT",
+    "documentation": "Comprehensive guides in Assets/ and wiki/",
+    "key_systems": [
+      "Spaceship System (6 ship templates)",
+      "Space Station Editor (modular construction)",
+      "Way System (guilds and networks)",
+      "Personnel System (31 roles)",
+      "Faction AI (8 personality dispositions)",
+      "Trading System (dynamic economy)",
+      "Combat System (6 weapon types)",
+      "Quest System (10 quest types)",
+      "Map System (universe navigation)",
+      "Enhanced Input (30+ actions)"
+    ],
+    "development_status": "Code 85% complete, Content 10% complete",
+    "reality_check": "C++ systems implemented, editor content (Blueprints, Data Assets, Maps, UI) needs creation",
+    "python_tools": [
+      "SmokeTest.py - Automated testing",
+      "ScreenshotTester.py - Visual regression",
+      "AutomationRunner.py - Test orchestration",
+      "ScenePopulator.py - Scene automation",
+      "ProceduralGenerators.py - Content generation",
+      "SetupCheck.py - Environment validation"
+    ],
+    "yaml_templates": "Ready-to-use templates for all major systems in Assets/",
+    "build_tools": "GitHub Actions CI/CD, Docker support for cloud builds",
+    "documentation_index": "https://github.com/Mittenzx/Adastrea/blob/main/DOCUMENTATION_INDEX.md"
+  }
+}
