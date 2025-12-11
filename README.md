@@ -6,6 +6,8 @@ A Model Context Protocol (MCP) server for managing game project information for 
 
 This MCP server is specifically designed for the Adastrea game project, providing a centralized way for AI agents to understand and work with all aspects of the game's development.
 
+**Game Repository:** https://github.com/Mittenzx/Adastrea
+
 ## Features
 
 - **Centralized Game Project Information**: Store all details about your game project in one place
@@ -58,6 +60,7 @@ Update or add game project information. Supports partial updates - only provide 
 - `platform` (array): Target platforms (e.g., ["PC", "Console", "Mobile"])
 - `engine` (string): Game engine being used (e.g., Unity, Unreal, Godot)
 - `status` (string): Current development status (e.g., Planning, In Development, Testing, Released)
+- `repository_url` (string): URL to the game's source code repository
 - `team` (array): Team members and their roles
 - `features` (array): Key features of the game
 - `technical_details` (object): Technical specifications and architecture details
@@ -71,6 +74,7 @@ Update or add game project information. Supports partial updates - only provide 
   "genre": "RPG",
   "engine": "Unity",
   "status": "In Development",
+  "repository_url": "https://github.com/Mittenzx/Adastrea",
   "platform": ["PC", "Console"],
   "features": [
     "Open world exploration",

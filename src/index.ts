@@ -123,6 +123,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: "string",
               description: "Current development status (e.g., Planning, In Development, Testing, Released)",
             },
+            repository_url: {
+              type: "string",
+              description: "URL to the game's source code repository (e.g., GitHub URL)",
+            },
             team: {
               type: "array",
               items: {
@@ -280,6 +284,10 @@ function formatProjectSummary(project: any): string {
   
   if (project.status) {
     lines.push(`**Status:** ${project.status}`);
+  }
+  
+  if (project.repository_url) {
+    lines.push(`**Repository:** ${project.repository_url}`);
   }
   
   lines.push("");

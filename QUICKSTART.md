@@ -2,6 +2,8 @@
 
 This guide will help you get started with Adastrea-MCP quickly. This MCP server is designed for the **Adastrea** game project.
 
+**Adastrea Game Repository:** https://github.com/Mittenzx/Adastrea
+
 ## Installation
 
 1. Clone the repository:
@@ -77,6 +79,7 @@ Update the game info with:
 - engine: "Unreal Engine 5"
 - platform: ["PC", "PlayStation 5", "Xbox Series X"]
 - status: "In Development"
+- repository_url: "https://github.com/Mittenzx/Adastrea"
 - features: ["Open world", "Dynamic combat", "Rich storyline"]
 ```
 

@@ -12,6 +12,7 @@ export interface GameProject {
   platform?: string[];
   engine?: string;
   status?: string;
+  repository_url?: string;
   team?: Array<{ name: string; role: string }>;
   features?: string[];
   technical_details?: Record<string, any>;
