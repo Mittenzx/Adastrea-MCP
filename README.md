@@ -30,7 +30,7 @@ Add this to your MCP client configuration (e.g., Claude Desktop, Cline, or other
   "mcpServers": {
     "adastrea": {
       "command": "node",
-      "args": ["/path/to/Adastrea-MCP/build/index.js"]
+      "args": ["/absolute/path/to/Adastrea-MCP/build/index.js"]
     }
   }
 }
