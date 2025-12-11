@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "adastrea": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/Adastrea-MCP/build/index.js"
+      ]
+    }
+  }
+}
