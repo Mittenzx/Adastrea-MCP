@@ -1,6 +1,10 @@
 # Adastrea-MCP
 
-A Model Context Protocol (MCP) server for managing game project information. This server allows AI agents and tools to store, retrieve, and manage comprehensive details about your game development project.
+A Model Context Protocol (MCP) server for managing game project information for **Adastrea**. This server allows AI agents and tools to store, retrieve, and manage comprehensive details about the Adastrea game development project.
+
+## About Adastrea
+
+This MCP server is specifically designed for the Adastrea game project, providing a centralized way for AI agents to understand and work with all aspects of the game's development.
 
 ## Features
 
@@ -63,7 +67,7 @@ Update or add game project information. Supports partial updates - only provide 
 **Example:**
 ```json
 {
-  "name": "Epic Adventure",
+  "name": "Adastrea",
   "genre": "RPG",
   "engine": "Unity",
   "status": "In Development",
@@ -92,17 +96,16 @@ Clear all game project information and start fresh.
 1. **Initialize Project Information:**
    ```
    Use update_game_info to set:
-   - name: "Mystic Quest"
+   - name: "Adastrea"
    - genre: "Action RPG"
    - engine: "Unreal Engine 5"
-   - status: "Planning"
+   - status: "In Development"
    ```
 
 2. **Add Team Information:**
    ```
    Use update_game_info to add team:
-   - [{name: "Alice", role: "Lead Developer"},
-      {name: "Bob", role: "Artist"}]
+   - [{name: "Mittenzx", role: "Lead Developer"}]
    ```
 
 3. **Access Project Info:**

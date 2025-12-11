@@ -45,7 +45,7 @@ server.stderr.on('data', (data) => {
 });
 
 // Helper to send JSON-RPC request
-function sendRequest(method, params, id = 1) {
+function sendRequest(method: string, params: any, id = 1) {
   const request = {
     jsonrpc: '2.0',
     method,
@@ -82,9 +82,9 @@ setTimeout(() => {
         sendRequest('tools/call', {
           name: 'update_game_info',
           arguments: {
-            name: 'Test RPG Game',
-            genre: 'RPG',
-            engine: 'Unity',
+            name: 'Adastrea',
+            genre: 'Action RPG',
+            engine: 'Unreal Engine 5',
             platform: ['PC', 'Console'],
             status: 'In Development'
           }

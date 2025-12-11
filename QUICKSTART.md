@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-This guide will help you get started with Adastrea-MCP quickly.
+This guide will help you get started with Adastrea-MCP quickly. This MCP server is designed for the **Adastrea** game project.
 
 ## Installation
 
@@ -52,10 +52,10 @@ Once configured, you can start using the MCP server through your AI assistant:
 1. **Set up your project information:**
    ```
    "Can you update the game project information with:
-   - name: My Awesome Game
+   - name: Adastrea
    - genre: Action RPG
    - engine: Unreal Engine 5
-   - status: Planning"
+   - status: In Development"
    ```
 
 2. **View project information:**
@@ -71,21 +71,19 @@ Once configured, you can start using the MCP server through your AI assistant:
 ### Setting Up a New Project
 ```
 Update the game info with:
-- name: "Fantasy Quest"
-- description: "An epic fantasy adventure with magic and dragons"
+- name: "Adastrea"
+- description: "An epic fantasy adventure game"
 - genre: "Action RPG"
-- engine: "Unity"
+- engine: "Unreal Engine 5"
 - platform: ["PC", "PlayStation 5", "Xbox Series X"]
-- status: "Planning"
-- features: ["Open world", "Magic system", "Dragon riding"]
+- status: "In Development"
+- features: ["Open world", "Dynamic combat", "Rich storyline"]
 ```
 
 ### Adding Team Information
 ```
-Add team members to the project:
-- Alice Johnson - Lead Developer
-- Bob Smith - Game Designer
-- Carol White - 3D Artist
+Add team members to the Adastrea project:
+- Mittenzx - Lead Developer
 ```
 
 ### Tracking Milestones
