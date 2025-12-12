@@ -92,13 +92,13 @@ Add team members to the Adastrea project:
 ### Tracking Milestones
 ```
 Set up project timeline with milestones:
-- Started: 2025-01-01
-- Estimated completion: 2026-06-30
+- Started: 2027-01-01
+- Estimated completion: 2028-06-30
 - Milestones:
-  - Prototype (2025-03-01) - In Progress
-  - Alpha (2025-09-01) - Planned
-  - Beta (2025-12-01) - Planned
-  - Release (2026-06-30) - Planned
+  - Prototype (2027-03-01) - In Progress
+  - Alpha (2027-09-01) - Planned
+  - Beta (2028-01-15) - Planned
+  - Release (2028-06-30) - Planned
 ```
 
 ## Verifying Installation

@@ -10,10 +10,62 @@ import {
   ErrorCode,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
-import { GameProjectStorage } from "./storage.js";
+import { GameProjectStorage, GameProject } from "./storage.js";
 
 // Initialize storage
 const storage = new GameProjectStorage();
+
+// Helper function for deep merging objects
+function deepMerge(target: any, source: any): any {
+  const output = { ...target };
+  
+  for (const key in source) {
+    if (source[key] instanceof Object && key in target && target[key] instanceof Object) {
+      if (Array.isArray(source[key])) {
+        // For arrays, replace entirely
+        output[key] = source[key];
+      } else {
+        // For objects, recursively merge
+        output[key] = deepMerge(target[key], source[key]);
+      }
+    } else {
+      output[key] = source[key];
+    }
+  }
+  
+  return output;
+}
+
+// Validation function for GameProject fields
+function validateGameProject(data: any): void {
+  if (data.platform !== undefined && !Array.isArray(data.platform)) {
+    throw new Error("Field 'platform' must be an array");
+  }
+  
+  if (data.team !== undefined) {
+    if (!Array.isArray(data.team)) {
+      throw new Error("Field 'team' must be an array");
+    }
+    data.team.forEach((member: any, index: number) => {
+      if (!member.name || !member.role) {
+        throw new Error(`Team member at index ${index} must have 'name' and 'role' properties`);
+      }
+    });
+  }
+  
+  if (data.features !== undefined && !Array.isArray(data.features)) {
+    throw new Error("Field 'features' must be an array");
+  }
+  
+  if (data.timeline !== undefined) {
+    if (typeof data.timeline !== 'object' || Array.isArray(data.timeline)) {
+      throw new Error("Field 'timeline' must be an object");
+    }
+    if (data.timeline.milestones !== undefined && !Array.isArray(data.timeline.milestones)) {
+      throw new Error("Field 'timeline.milestones' must be an array");
+    }
+  }
+}
 
 // Create server instance
 const server = new Server(
@@ -31,8 +83,6 @@ const server = new Server(
 
 // List available resources
 server.setRequestHandler(ListResourcesRequestSchema, async () => {
-  const project = await storage.getProject();
-  
   return {
     resources: [
       {
@@ -204,8 +254,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   if (name === "update_game_info") {
+    // Validate input arguments
+    try {
+      validateGameProject(args || {});
+    } catch (validationError) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid input: ${validationError instanceof Error ? validationError.message : String(validationError)}`
+      );
+    }
+    
     const project = await storage.getProject();
-    const updatedProject = { ...project, ...(args || {}) };
+    const updatedProject = deepMerge(project, args || {});
     await storage.saveProject(updatedProject);
     
     return {
@@ -256,7 +316,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 // Format project summary for human reading
-function formatProjectSummary(project: any): string {
+function formatProjectSummary(project: GameProject): string {
   const lines: string[] = [];
   
   if (project.name) {
@@ -274,7 +334,7 @@ function formatProjectSummary(project: any): string {
     lines.push(`**Genre:** ${project.genre}`);
   }
   
-  if (project.platform && project.platform.length > 0) {
+  if (Array.isArray(project.platform) && project.platform.length > 0) {
     lines.push(`**Platforms:** ${project.platform.join(", ")}`);
   }
   

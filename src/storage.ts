@@ -47,10 +47,20 @@ export class GameProjectStorage {
       try {
         const defaultData = await fs.readFile(this.defaultDataFile, "utf-8");
         const project = JSON.parse(defaultData);
-        // Save it as the current project data for future reads
-        await this.saveProject(project);
-        return project;
+        
+        // Before saving, check if the main data file now exists (to avoid race condition)
+        try {
+          await fs.access(this.dataFile);
+          // File now exists, read and return it
+          const data = await fs.readFile(this.dataFile, "utf-8");
+          return JSON.parse(data);
+        } catch {
+          // File still does not exist, safe to save
+          await this.saveProject(project);
+          return project;
+        }
       } catch (defaultError) {
+        console.error(`Failed to load default project data from ${this.defaultDataFile}:`, defaultError);
         // Return empty object if neither file exists
         return {};
       }
@@ -58,8 +68,12 @@ export class GameProjectStorage {
   }
 
   async saveProject(project: GameProject): Promise<void> {
-    const data = JSON.stringify(project, null, 2);
-    await fs.writeFile(this.dataFile, data, "utf-8");
+    try {
+      const data = JSON.stringify(project, null, 2);
+      await fs.writeFile(this.dataFile, data, "utf-8");
+    } catch (error) {
+      throw new Error(`Failed to save project data to ${this.dataFile}: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   async clearProject(): Promise<void> {
