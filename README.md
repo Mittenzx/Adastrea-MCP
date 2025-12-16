@@ -2,6 +2,8 @@
 
 A Model Context Protocol (MCP) server for managing game project information for **Adastrea**. This server allows AI agents and tools to store, retrieve, and manage comprehensive details about the Adastrea game development project.
 
+**🚀 Vision:** Building the world's best Unreal Engine MCP server. See our [ROADMAP.md](./ROADMAP.md) for the strategic plan.
+
 ## About Adastrea
 
 This MCP server is specifically designed for the Adastrea game project, providing a centralized way for AI agents to understand and work with all aspects of the game's development.
@@ -150,6 +152,22 @@ npm run build
 ```bash
 npm run watch
 ```
+
+## Roadmap
+
+We're on a mission to build the world's best Unreal Engine MCP server! Our comprehensive roadmap includes:
+
+- **Phase 1:** Foundation Enhancement - Deep Unreal project understanding
+- **Phase 2:** Deep UE Integration - Editor plugin and real-time interaction  
+- **Phase 3:** AI-Enhanced Tools - Intelligent code generation and refactoring
+- **Phase 4:** Advanced Ecosystem - Multi-project support, marketplace integration
+- **Phase 5:** Intelligence & Automation - Semantic understanding and predictive assistance
+
+📋 **[View Full Roadmap](./ROADMAP.md)** for detailed plans, timelines, and contribution opportunities.
+
+## Contributing
+
+We welcome contributions! Whether you're fixing bugs, adding features, improving documentation, or testing with your Unreal Engine projects, your help is valuable. Check out our [ROADMAP.md](./ROADMAP.md) to see where you can contribute.
 
 ## License
 

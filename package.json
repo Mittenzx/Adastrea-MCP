@@ -1,7 +1,7 @@
 {
   "name": "adastrea-mcp",
   "version": "1.0.0",
-  "description": "MCP server for managing game project information",
+  "description": "Model Context Protocol server for Unreal Engine game development - Building the world's best Unreal MCP",
   "type": "module",
   "main": "build/index.js",
   "bin": {
@@ -14,10 +14,21 @@
   },
   "keywords": [
     "mcp",
+    "model-context-protocol",
+    "unreal-engine",
+    "unreal-engine-5",
+    "ue5",
     "game-development",
-    "project-management"
+    "gamedev",
+    "project-management",
+    "ai-tools",
+    "developer-tools",
+    "code-analysis",
+    "blueprint",
+    "cpp",
+    "game-engine"
   ],
-  "author": "",
+  "author": "Mittenzx",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0"
