@@ -8,10 +8,29 @@ This document outlines the immediate actionable steps to begin implementing the 
 - [x] Create comprehensive ROADMAP.md document
 - [x] Update README with vision and roadmap link
 - [x] Create CONTRIBUTING.md for community involvement
+- [x] Identify Adastrea-Director as UE plugin implementation
 
 ### 🎯 Immediate Actions
 
-#### 1. Community Engagement (Days 1-3)
+#### 0. Adastrea-Director Integration Planning (Days 1-2)
+- [ ] **Study Adastrea-Director Architecture**
+  - Review [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) codebase
+  - Understand existing MCP server capabilities (`mcp_server/server.py`)
+  - Document available tools: `project-info`, `list-assets`, `run-python`, `console`, etc.
+  - Analyze IPC communication between C++ plugin and Python backend
+
+- [ ] **Design Integration Bridge**
+  - Define how Adastrea-MCP will communicate with Adastrea-Director's MCP server
+  - Explore MCP-to-MCP communication patterns
+  - Plan resource/tool delegation strategy
+  - Design fallback mechanisms when Director is unavailable
+
+- [ ] **Identify Synergies**
+  - Map Adastrea-Director capabilities to Phase 2 roadmap items
+  - Identify which features are already implemented vs. need development
+  - Plan complementary features (Director = runtime, MCP = static analysis)
+
+#### 1. Community Engagement (Days 3-5)
 - [ ] Share roadmap on Unreal Engine forums
 - [ ] Post on r/unrealengine subreddit
 - [ ] Share with MCP developer community
@@ -25,11 +44,11 @@ This document outlines the immediate actionable steps to begin implementing the 
   - Test with multiple UE versions (5.3, 5.4, 5.5, 5.6)
   - Document findings
 
-- [ ] **Explore UE Python API**
-  - Set up UE Python scripting environment
-  - Test asset registry access
-  - Test Blueprint metadata extraction
-  - Evaluate feasibility of Phase 2 editor plugin
+- [ ] **Explore UE Python API via Adastrea-Director**
+  - Study Adastrea-Director's `ue_python_api.py` wrapper
+  - Review existing asset registry access implementation
+  - Understand Blueprint metadata extraction capabilities
+  - Test Adastrea-Director's MCP server locally
 
 - [ ] **Evaluate C++ Analysis Tools**
   - Test clangd integration for UE projects
@@ -91,12 +110,16 @@ This document outlines the immediate actionable steps to begin implementing the 
 - [ ] Performance testing
 
 #### Blueprint Metadata Extraction
-- [ ] Research .uasset parsing (UE Python API)
-- [ ] Extract Blueprint class names
-- [ ] Extract parent classes
-- [ ] List Blueprint interfaces
+- [ ] **Leverage Adastrea-Director for runtime Blueprint data**
+  - Use Director's `list-assets` tool for Blueprint inventory
+  - Use Director's Python execution for deep Blueprint inspection
+  - Create bridge between Adastrea-MCP and Director's asset tools
+- [ ] **Static Blueprint analysis** (without UE running)
+  - Research .uasset file structure for offline parsing
+  - Extract Blueprint class names from file metadata
+  - Build Blueprint class registry
 - [ ] Add resource: `unreal://project/blueprints`
-- [ ] Add tool: `inspect_blueprint`
+- [ ] Add tool: `inspect_blueprint` (delegates to Director when available)
 - [ ] Integration testing
 
 ### Documentation & Testing
@@ -193,6 +216,62 @@ These tasks can be started right away with minimal dependencies:
 - [ ] Small game project (~10 classes)
 - [ ] Medium project (~100 classes)
 - [ ] Large project (1000+ classes) - like Adastrea
+- [ ] Adastrea-Director plugin installed in test projects
+
+### Integration Tools
+- [ ] Clone [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director)
+- [ ] Review Adastrea-Director documentation
+- [ ] Test Adastrea-Director MCP server locally
+- [ ] Experiment with Director's IPC communication
+
+## Adastrea-Director Integration Architecture
+
+### How Adastrea-MCP and Adastrea-Director Work Together
+
+**Adastrea-MCP** (this project):
+- **Static Analysis**: Code structure, dependencies, patterns (without UE running)
+- **Project Metadata**: Documentation, build configs, team info
+- **Planning**: Roadmaps, task breakdown, recommendations
+- **Cross-Project**: Work across multiple UE projects simultaneously
+
+**Adastrea-Director** ([github.com/Mittenzx/Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director)):
+- **Runtime Integration**: Live UE Editor interaction (requires UE running)
+- **Asset Manipulation**: Real-time asset operations
+- **Code Execution**: Run Python in UE Editor
+- **RAG/Planning**: Document-based assistance, task decomposition
+
+### Communication Flow
+
+```
+AI Agent (Claude, VS Code Copilot, etc.)
+    ↓
+Adastrea-MCP Server (Node.js)
+    ├─→ Static analysis (always available)
+    └─→ Adastrea-Director MCP Server (Python)
+         └─→ UE Editor Plugin (C++)
+              └─→ Unreal Engine (running)
+```
+
+### Resource Delegation Strategy
+
+| Operation | Handler | Requires UE Running? |
+|-----------|---------|----------------------|
+| Parse .uproject | Adastrea-MCP | No |
+| Index C++ classes | Adastrea-MCP | No |
+| List all assets | **Both** (offline: MCP, live: Director) | Optional |
+| Spawn actor | Adastrea-Director | Yes |
+| Execute Python | Adastrea-Director | Yes |
+| Run console command | Adastrea-Director | Yes |
+| Blueprint inspection | **Both** (static: MCP, runtime: Director) | Optional |
+| Code generation | Adastrea-MCP | No |
+
+### Benefits of This Approach
+
+1. **Complementary Capabilities**: Each system does what it's best at
+2. **Graceful Degradation**: Static analysis works even when UE is closed
+3. **No Duplication**: Leverage existing Adastrea-Director features
+4. **Unified Experience**: AI agents see one comprehensive toolset
+5. **Faster Development**: Build on proven plugin infrastructure
 
 ## Getting Help
 

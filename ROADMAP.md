@@ -92,24 +92,26 @@
 ### Phase 2: Deep Unreal Integration (Q2 2026)
 **Goal:** Enable direct interaction with Unreal Engine Editor and runtime
 
-#### 2.1 Editor Communication Layer
-- [ ] **Unreal Engine Editor Plugin**
-  - Develop companion UE plugin for bidirectional communication
-  - WebSocket or HTTP server within UE Editor
-  - Real-time project state synchronization
-  - Command execution interface
+> 🔗 **Implementation Note:** Phase 2 integration leverages the existing [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) Unreal Engine plugin, which already provides C++ editor integration, Python backend with IPC communication, and MCP server capabilities. The focus is on integrating Adastrea-MCP with Adastrea-Director's infrastructure.
 
-- [ ] **Editor State Access**
-  - Current level/map information
+#### 2.1 Editor Communication Layer
+- [ ] **Unreal Engine Editor Plugin Integration**
+  - **Leverage Adastrea-Director plugin** - Already provides C++ UE plugin with Python bridge
+  - Integrate Adastrea-MCP with Adastrea-Director's IPC/MCP server
+  - Real-time project state synchronization via existing MCP tools
+  - Command execution through Adastrea-Director's remote execution API
+
+- [ ] **Editor State Access** (via Adastrea-Director)
+  - Current level/map information (already available via `project-info` tool)
   - Selected actors and components
   - Editor viewport state
   - Current editing context
 
-- [ ] **Remote Editor Control**
-  - Open assets programmatically
-  - Execute editor commands
+- [ ] **Remote Editor Control** (via Adastrea-Director)
+  - Open assets programmatically (leverage existing asset management)
+  - Execute editor commands (via `console` tool)
   - Trigger builds and cooking
-  - Run automation tests
+  - Run automation tests (integrate with existing Python automation)
 
 #### 2.2 Blueprint Interaction Tools
 - [ ] **Blueprint Inspection Tools**
@@ -280,19 +282,27 @@ MCP Server (Node.js/TypeScript)
 JSON File Storage
 ```
 
-### Target Architecture (Phase 4)
+### Phase 2+ Architecture (with Adastrea-Director Integration)
 ```
-MCP Client (Claude, Cline, etc.)
+MCP Client (Claude, Cline, VS Code Copilot, etc.)
     ↓
-MCP Server (Node.js/TypeScript)
-    ├── Core MCP Layer
+Adastrea-MCP Server (Node.js/TypeScript)
+    ├── Core MCP Layer (project metadata, docs)
     ├── Unreal Engine Interface
-    │   ├── Editor Plugin (C++/Python)
-    │   ├── Asset Registry Cache
-    │   ├── Code Analysis Engine
-    │   └── Build System Interface
+    │   └── Bridge to Adastrea-Director
+    │       ↓
+    │   Adastrea-Director (github.com/Mittenzx/Adastrea-Director)
+    │       ├── UE C++ Plugin (Editor integration)
+    │       ├── Python Backend (IPC communication)
+    │       ├── MCP Server (remote execution, asset mgmt)
+    │       ├── RAG System (document understanding)
+    │       └── Planning Agents (task decomposition)
+    │
+    ├── Code Analysis Engine
+    │   ├── C++ Parser (clangd)
+    │   ├── Blueprint Metadata Extractor
+    │   └── Code Index (SQLite)
     ├── Intelligence Layer
-    │   ├── Code Understanding (LSP)
     │   ├── Pattern Recognition
     │   ├── Semantic Search
     │   └── Recommendation Engine
@@ -301,6 +311,23 @@ MCP Server (Node.js/TypeScript)
         ├── Code Index (SQLite)
         └── Asset Cache (LevelDB)
 ```
+
+### Integration Strategy
+
+**Adastrea-MCP** focuses on:
+- Static analysis (code structure, dependencies, patterns)
+- Project metadata and documentation
+- Build configuration and planning
+- Cross-project capabilities
+
+**Adastrea-Director** provides:
+- Live Unreal Engine editor integration
+- Real-time asset and actor manipulation
+- Python code execution in UE
+- RAG-based documentation assistance
+- Autonomous planning and task decomposition
+
+Together, they form a complete development ecosystem where Adastrea-MCP provides the "brain" (understanding, planning, analysis) and Adastrea-Director provides the "hands" (execution, manipulation, real-time interaction).
 
 ---
 
@@ -519,9 +546,9 @@ MCP Server (Node.js/TypeScript)
 ### Technology Stack
 - **Core Server:** Node.js, TypeScript, MCP SDK
 - **Code Analysis:** clangd, tree-sitter, TypeScript compiler API
-- **UE Plugin:** C++, Python, Unreal Engine API
+- **UE Integration:** [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) (C++ plugin + Python backend + MCP server)
 - **Storage:** SQLite (indexing), LevelDB (caching), JSON (metadata)
-- **Communication:** WebSocket, HTTP/REST, IPC
+- **Communication:** WebSocket, HTTP/REST, IPC (via Adastrea-Director)
 - **AI/ML:** Semantic search models, pattern recognition
 
 ### Infrastructure
@@ -536,10 +563,12 @@ MCP Server (Node.js/TypeScript)
 
 ### Immediate Next Steps (Week 1-2)
 1. ✅ **This Roadmap Document** - Define the vision
-2. **Community Feedback** - Share with UE developers, gather input
-3. **Technology Validation** - Prototype .uproject parsing
-4. **Architecture Planning** - Detailed design for Phase 1
-5. **Setup Development Environment** - Prepare UE5 test projects
+2. ✅ **Adastrea-Director Integration** - Reference existing UE plugin infrastructure
+3. **Explore Integration Points** - Analyze how to bridge Adastrea-MCP with Adastrea-Director
+4. **Community Feedback** - Share with UE developers, gather input
+5. **Technology Validation** - Prototype .uproject parsing
+6. **Architecture Planning** - Detailed design for Phase 1 + Phase 2 integration
+7. **Setup Development Environment** - Prepare UE5 test projects
 
 ### Phase 1 Kickoff (Month 1)
 1. **Project Structure Parser** - Implement .uproject parsing

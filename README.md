@@ -158,12 +158,23 @@ npm run watch
 We're on a mission to build the world's best Unreal Engine MCP server! Our comprehensive roadmap includes:
 
 - **Phase 1:** Foundation Enhancement - Deep Unreal project understanding
-- **Phase 2:** Deep UE Integration - Editor plugin and real-time interaction  
+- **Phase 2:** Deep UE Integration - Leveraging [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) plugin for real-time editor interaction
 - **Phase 3:** AI-Enhanced Tools - Intelligent code generation and refactoring
 - **Phase 4:** Advanced Ecosystem - Multi-project support, marketplace integration
 - **Phase 5:** Intelligence & Automation - Semantic understanding and predictive assistance
 
 📋 **[View Full Roadmap](./ROADMAP.md)** for detailed plans, timelines, and contribution opportunities.
+
+### Integration with Adastrea-Director
+
+Adastrea-MCP works seamlessly with [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director), a comprehensive Unreal Engine plugin that provides:
+- **C++ UE Editor Plugin** for live engine integration
+- **Python Backend** with IPC communication
+- **MCP Server** for remote execution and asset management
+- **RAG System** for intelligent document understanding
+- **Planning Agents** for autonomous task decomposition
+
+Together, Adastrea-MCP (static analysis and planning) and Adastrea-Director (runtime execution) form a complete AI-assisted game development ecosystem.
 
 ## Contributing
 
