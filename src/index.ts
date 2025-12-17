@@ -12,12 +12,54 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { GameProjectStorage, GameProject } from "./storage.js";
 import { UnrealProjectManager } from "./unreal/index.js";
+import { EditorBridge } from "./director/index.js";
 
 // Initialize storage
 const storage = new GameProjectStorage();
 
 // Initialize Unreal project manager (will be set if project path is provided)
 let unrealManager: UnrealProjectManager | null = null;
+
+// Initialize Editor Bridge for Adastrea-Director integration
+const editorBridge = new EditorBridge({
+  enableDirector: true,
+  fallbackToLocal: true,
+  directorConfig: {
+    baseUrl: process.env.DIRECTOR_URL || 'http://localhost:3001',
+    timeout: 10000,
+    autoReconnect: true,
+    healthCheckInterval: 30000,
+  },
+});
+
+// Initialize bridge on startup
+editorBridge.initialize().catch((err: unknown) => {
+  let errorType = 'Unknown error';
+  let errorCode: string | number | undefined;
+
+  if (err && typeof err === 'object') {
+    const anyErr = err as { name?: string; code?: string | number };
+    if (anyErr.name) {
+      errorType = anyErr.name;
+    } else if ((anyErr as any).constructor && (anyErr as any).constructor.name) {
+      errorType = (anyErr as any).constructor.name;
+    }
+    errorCode = anyErr.code;
+  }
+
+  const details =
+    errorCode !== undefined
+      ? ` [type=${errorType}, code=${errorCode}]`
+      : ` [type=${errorType}]`;
+
+  console.warn(
+    'Failed to initialize Director bridge (this is expected if Adastrea-Director is not running)' +
+      details +
+      ':',
+    err,
+  );
+  console.warn('The MCP server will continue to operate using local analysis only.');
+});
 
 // Helper function for deep merging objects
 function deepMerge(target: any, source: any): any {
@@ -150,6 +192,24 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
     );
   }
 
+  // Add Director-specific resources when Director is actively connected
+  if (editorBridge.isDirectorAvailable()) {
+    resources.push(
+      {
+        uri: "unreal://editor/state",
+        name: "Editor State",
+        description: "Current state of the Unreal Engine Editor (requires Adastrea-Director)",
+        mimeType: "application/json",
+      },
+      {
+        uri: "unreal://editor/capabilities",
+        name: "Editor Capabilities",
+        description: "Available capabilities based on Director connection status",
+        mimeType: "application/json",
+      }
+    );
+  }
+
   return { resources };
 });
 
@@ -276,6 +336,33 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
         ],
       };
     }
+  }
+
+  // Director-specific resources
+  if (uri === "unreal://editor/state") {
+    const state = await editorBridge.getEditorState();
+    return {
+      contents: [
+        {
+          uri,
+          mimeType: "application/json",
+          text: JSON.stringify(state || { isRunning: false }, null, 2),
+        },
+      ],
+    };
+  }
+
+  if (uri === "unreal://editor/capabilities") {
+    const capabilities = editorBridge.getCapabilities();
+    return {
+      contents: [
+        {
+          uri,
+          mimeType: "application/json",
+          text: JSON.stringify(capabilities, null, 2),
+        },
+      ],
+    };
   }
 
   throw new McpError(
@@ -489,6 +576,55 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["asset_path"],
         },
       },
+      {
+        name: "execute_console_command",
+        description: "Execute a console command in the Unreal Engine Editor (requires Adastrea-Director to be running)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            command: {
+              type: "string",
+              description: "Console command to execute (e.g., 'stat fps', 'ke * list')",
+            },
+          },
+          required: ["command"],
+        },
+      },
+      {
+        name: "run_python_script",
+        description: "Execute Python code in the Unreal Engine Editor (requires Adastrea-Director to be running)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            code: {
+              type: "string",
+              description: "Python code to execute in the UE Editor",
+            },
+          },
+          required: ["code"],
+        },
+      },
+      {
+        name: "get_live_project_info",
+        description: "Get live project information from the running Unreal Engine Editor via Adastrea-Director (prefers live data over cached)",
+        inputSchema: {
+          type: "object",
+          properties: {},
+        },
+      },
+      {
+        name: "list_assets_live",
+        description: "List assets from the running Unreal Engine Editor in real-time via Adastrea-Director (prefers live data over cached)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            filter: {
+              type: "string",
+              description: "Optional filter string to search for specific assets",
+            },
+          },
+        },
+      },
     ],
   };
 });
@@ -565,6 +701,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
       unrealManager = new UnrealProjectManager(args.project_path as string);
       await unrealManager.scanProject();
+      
+      // Set the unrealManager in the bridge for fallback operations.
+      // NOTE: This enables fallback functionality for Director integration tools
+      // (like list_assets_live, get_live_project_info) when Director is unavailable.
+      // Without calling scan_unreal_project first, these tools won't have local data to fall back to.
+      editorBridge.setUnrealManager(unrealManager);
       
       const summary = unrealManager.getProjectSummary();
       
@@ -752,6 +894,73 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         },
       ],
     };
+  }
+
+  // Helper function for Director tool error handling
+  const handleDirectorToolCall = async <T>(
+    operation: () => Promise<T>,
+    errorMessage: string
+  ): Promise<{ content: Array<{ type: string; text: string }> }> => {
+    try {
+      const result = await operation();
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `${errorMessage}: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  };
+
+  // Director integration tools
+  if (name === "execute_console_command") {
+    if (!args || typeof args.command !== 'string') {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "command is required and must be a string"
+      );
+    }
+
+    return handleDirectorToolCall(
+      () => editorBridge.executeConsoleCommand(args.command as string),
+      "Failed to execute console command"
+    );
+  }
+
+  if (name === "run_python_script") {
+    if (!args || typeof args.code !== 'string') {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "code is required and must be a string"
+      );
+    }
+
+    return handleDirectorToolCall(
+      () => editorBridge.executePythonScript(args.code as string),
+      "Failed to execute Python script"
+    );
+  }
+
+  if (name === "get_live_project_info") {
+    return handleDirectorToolCall(
+      () => editorBridge.getProjectInfo(),
+      "Failed to get project info"
+    );
+  }
+
+  if (name === "list_assets_live") {
+    const filter = args?.filter as string | undefined;
+    return handleDirectorToolCall(
+      () => editorBridge.listAssets(filter),
+      "Failed to list assets"
+    );
   }
 
   throw new McpError(
