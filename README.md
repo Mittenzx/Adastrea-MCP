@@ -229,9 +229,24 @@ Execute Python code in the Unreal Engine Editor's embedded Python interpreter.
 
 #### get_live_project_info
 
-Get live project information from the running UE Editor. Prefers live data from Adastrea-Director over cached local data.
+Get live project information from the running UE Editor. Prefers live data from Adastrea-Director over cached local data. Falls back to local analysis if Director is unavailable.
 
 **Parameters:** None
+
+**Example Response:**
+```json
+{
+  "projectInfo": {
+    "projectName": "MyGame",
+    "projectPath": "C:/Projects/MyGame",
+    "engineVersion": "5.3",
+    "isLoaded": true
+  },
+  "source": "director",
+  "directorAvailable": true,
+  "localAnalysisAvailable": true
+}
+```
 
 #### list_assets_live
 

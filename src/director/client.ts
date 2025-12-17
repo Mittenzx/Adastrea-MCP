@@ -22,6 +22,7 @@ export class DirectorClient {
   private status: DirectorConnectionStatus = 'disconnected';
   private healthCheckTimer?: ReturnType<typeof setInterval>;
   private lastHeartbeat?: Date;
+  private isHealthCheckInProgress = false;
 
   constructor(config: DirectorConfig) {
     this.config = {
@@ -29,6 +30,7 @@ export class DirectorClient {
       timeout: config.timeout ?? 5000,
       autoReconnect: config.autoReconnect ?? true,
       healthCheckInterval: config.healthCheckInterval ?? 30000,
+      reconnectDelay: config.reconnectDelay ?? 5000,
     };
   }
 
@@ -180,6 +182,10 @@ export class DirectorClient {
 
   /**
    * Execute a console command in UE Editor
+   * 
+   * ⚠️ SECURITY WARNING: This method executes arbitrary console commands in the UE Editor
+   * with full editor permissions. Only use with trusted commands from trusted sources.
+   * Malicious commands could compromise the editor or project.
    */
   async executeConsoleCommand(command: string): Promise<ConsoleCommandResult> {
     if (!this.isConnected()) {
@@ -204,6 +210,11 @@ export class DirectorClient {
 
   /**
    * Execute Python code in UE Editor
+   * 
+   * ⚠️ SECURITY WARNING: This method executes arbitrary Python code in the UE Editor's
+   * embedded Python interpreter with full access to the Unreal Engine API. Only execute
+   * code from trusted sources. Malicious code could damage the project, access sensitive
+   * data, or compromise the system.
    */
   async executePythonScript(code: string): Promise<PythonExecutionResult> {
     if (!this.isConnected()) {
@@ -263,25 +274,35 @@ export class DirectorClient {
     this.stopHealthCheck();
     
     this.healthCheckTimer = setInterval(async () => {
-      const health = await this.checkHealth();
+      // Prevent overlapping health checks
+      if (this.isHealthCheckInProgress) {
+        return;
+      }
       
-      if (health.status === 'connected') {
-        this.lastHeartbeat = new Date();
+      this.isHealthCheckInProgress = true;
+      try {
+        const health = await this.checkHealth();
         
-        // Reconnect if status changed
-        if (this.status !== 'connected') {
-          this.status = 'connected';
-          console.log('Reconnected to Director');
+        if (health.status === 'connected') {
+          this.lastHeartbeat = new Date();
+          
+          // Reconnect if status changed
+          if (this.status !== 'connected') {
+            this.status = 'connected';
+            console.log('Reconnected to Director');
+          }
+        } else if (this.status === 'connected') {
+          // Lost connection
+          this.status = 'error';
+          console.warn('Lost connection to Director');
+          
+          // Try to reconnect if auto-reconnect is enabled
+          if (this.config.autoReconnect) {
+            setTimeout(() => this.connect(), this.config.reconnectDelay);
+          }
         }
-      } else if (this.status === 'connected') {
-        // Lost connection
-        this.status = 'error';
-        console.warn('Lost connection to Director');
-        
-        // Try to reconnect if auto-reconnect is enabled
-        if (this.config.autoReconnect) {
-          setTimeout(() => this.connect(), 5000);
-        }
+      } finally {
+        this.isHealthCheckInProgress = false;
       }
     }, this.config.healthCheckInterval);
   }

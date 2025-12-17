@@ -24,6 +24,9 @@ export interface DirectorConfig {
   
   /** Interval for health checks in milliseconds */
   healthCheckInterval?: number;
+  
+  /** Delay before attempting reconnection in milliseconds (default: 5000) */
+  reconnectDelay?: number;
 }
 
 /**
@@ -51,6 +54,12 @@ export interface EditorState {
   /** Current editing context */
   editingContext?: {
     mode: string;
+    /** 
+     * Additional context-specific details. May include properties like:
+     * - selectedTool: string (e.g., "Select", "Translate", "Rotate")
+     * - editingMode: string (e.g., "Landscape", "Foliage", "Modeling")
+     * - viewportName: string (e.g., "Top", "Front", "Perspective")
+     */
     details?: Record<string, any>;
   };
   

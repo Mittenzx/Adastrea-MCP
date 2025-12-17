@@ -104,26 +104,77 @@ export class EditorBridge {
 
   /**
    * Get project info - prefers Director (live) over local (cached)
+   * 
+   * Returns a structured object with the project info and metadata about the source
+   * so callers can distinguish between Director results, local results, and errors.
    */
-  async getProjectInfo(): Promise<any> {
+  async getProjectInfo(): Promise<{
+    projectInfo: any;
+    source: 'director' | 'local' | 'none';
+    directorAvailable: boolean;
+    localAnalysisAvailable: boolean;
+    error?: Error;
+  }> {
+    const directorAvailable = !!this.directorClient?.isConnected();
+    const localAnalysisAvailable = !!(this.unrealManager && this.config.fallbackToLocal);
+
     // Try Director first for live data
-    if (this.directorClient?.isConnected()) {
+    if (directorAvailable) {
       try {
-        const directorInfo = await this.directorClient.getProjectInfo();
+        const directorInfo = await this.directorClient!.getProjectInfo();
         if (directorInfo) {
-          return directorInfo;
+          return {
+            projectInfo: directorInfo,
+            source: 'director',
+            directorAvailable,
+            localAnalysisAvailable,
+          };
         }
       } catch (error) {
         console.warn('Failed to get project info from Director:', error);
+
+        // If Director fails but local analysis is available, fall back to local
+        if (localAnalysisAvailable) {
+          const localInfo = this.unrealManager!.getProjectConfig();
+          return {
+            projectInfo: localInfo,
+            source: 'local',
+            directorAvailable,
+            localAnalysisAvailable,
+            error: error instanceof Error ? error : new Error(String(error)),
+          };
+        }
+
+        // Director failed and no local analysis available
+        return {
+          projectInfo: null,
+          source: 'none',
+          directorAvailable,
+          localAnalysisAvailable,
+          error: error instanceof Error ? error : new Error(String(error)),
+        };
       }
     }
 
-    // Fall back to local analysis
-    if (this.unrealManager && this.config.fallbackToLocal) {
-      return this.unrealManager.getProjectConfig();
+    // Fall back to local analysis if enabled and available
+    if (localAnalysisAvailable) {
+      const localInfo = this.unrealManager!.getProjectConfig();
+      return {
+        projectInfo: localInfo,
+        source: 'local',
+        directorAvailable,
+        localAnalysisAvailable,
+      };
     }
 
-    return null;
+    // Neither Director nor local analysis can provide project info
+    return {
+      projectInfo: null,
+      source: 'none',
+      directorAvailable,
+      localAnalysisAvailable,
+      error: new Error('Project info unavailable: Director not connected and local analysis disabled or unavailable'),
+    };
   }
 
   /**
@@ -134,9 +185,8 @@ export class EditorBridge {
     if (this.directorClient?.isConnected()) {
       try {
         const assets = await this.directorClient.listAssets(filter);
-        if (assets.length > 0) {
-          return assets;
-        }
+        // Director is the authoritative source when available, even if it returns an empty list
+        return assets;
       } catch (error) {
         console.warn('Failed to list assets from Director:', error);
       }
