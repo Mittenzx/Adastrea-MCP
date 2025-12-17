@@ -126,7 +126,7 @@ export class UnrealAssetAnalyzer {
     if (dirPath.includes('Animations') || fileName.startsWith('A_') || fileName.startsWith('AM_')) {
       return 'Animation';
     }
-    if (dirPath.includes('Audio') || assetPath.includes('/Sound/')) {
+    if (dirPath.includes('Audio') || dirPath.includes('Sound')) {
       return 'Audio';
     }
     if (dirPath.includes('Particles') || fileName.startsWith('P_')) {

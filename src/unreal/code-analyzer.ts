@@ -218,7 +218,8 @@ export class UnrealCodeAnalyzer {
         let className = '';
         for (let j = startIndex; j >= 0; j--) {
           const prevLine = lines[j].trim();
-          const classMatch = prevLine.match(/class\s+\w+\s+(\w+)\s*(?::\s*public)?/);
+          // Handle optional API macros like MYMODULE_API
+          const classMatch = prevLine.match(/class\s+(?:\w+\s+)?(\w+)\s*(?::\s*public)?/);
           if (classMatch) {
             className = classMatch[1];
             break;
@@ -321,7 +322,18 @@ export class UnrealCodeAnalyzer {
       }
 
       // Strip default value if present: "Type Name = DefaultValue"
-      const declarationPart = trimmedParam.split('=')[0].trim();
+      // Note: This is a simple approach and may not handle all complex C++ expressions
+      // For robustness, we only split on '=' if it's not inside angle brackets
+      let declarationPart = trimmedParam;
+      let angleDepth = 0;
+      for (let i = 0; i < trimmedParam.length; i++) {
+        if (trimmedParam[i] === '<') angleDepth++;
+        else if (trimmedParam[i] === '>') angleDepth--;
+        else if (trimmedParam[i] === '=' && angleDepth === 0) {
+          declarationPart = trimmedParam.substring(0, i).trim();
+          break;
+        }
+      }
       const parts = declarationPart.split(/\s+/);
 
       if (parts.length >= 2) {
