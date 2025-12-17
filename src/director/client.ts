@@ -86,11 +86,27 @@ export class DirectorClient {
 
   /**
    * Check health of Director server
+   * 
+   * NOTE: This currently returns 'disconnected' as a placeholder.
+   * In production, this should make an HTTP request to Director's /health endpoint.
    */
   async checkHealth(): Promise<DirectorHealthStatus> {
     try {
-      // In a real implementation, this would make an HTTP request to Director's health endpoint
-      // For now, we return a mock status indicating disconnected (Director not running)
+      // TODO: Implement actual health check when Director REST API is available
+      // Example implementation:
+      // const response = await fetch(`${this.config.baseUrl}/health`, {
+      //   signal: AbortSignal.timeout(this.config.timeout),
+      // });
+      // const data = await response.json();
+      // return {
+      //   status: response.ok ? 'connected' : 'error',
+      //   editorConnected: data.editorConnected,
+      //   lastHeartbeat: new Date(),
+      //   version: data.version,
+      //   capabilities: data.capabilities,
+      // };
+      
+      // For now, return disconnected status (Director not running)
       return {
         status: 'disconnected',
         editorConnected: false,
@@ -212,6 +228,10 @@ export class DirectorClient {
 
   /**
    * Make a request to Director server
+   * 
+   * NOTE: This is a placeholder implementation. In production, this should
+   * use a proper HTTP client (fetch/axios) to make requests to the Director MCP server.
+   * The Director server should expose REST endpoints at the configured baseUrl.
    */
   private async request<T>(
     endpoint: string,
@@ -220,11 +240,19 @@ export class DirectorClient {
       body?: any;
     }
   ): Promise<DirectorResponse<T>> {
-    // Mock implementation - in production this would use fetch/axios
-    // For now, return a disconnected response
+    // TODO: Implement actual HTTP client when Director REST API is available
+    // Example implementation:
+    // const response = await fetch(`${this.config.baseUrl}${endpoint}`, {
+    //   method: options?.method || 'GET',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: options?.body ? JSON.stringify(options.body) : undefined,
+    //   signal: AbortSignal.timeout(this.config.timeout),
+    // });
+    // return await response.json();
+    
     return {
       success: false,
-      error: 'Director not connected - this is a placeholder implementation',
+      error: 'Director not connected - HTTP client not yet implemented. This is a placeholder for future REST API integration.',
     };
   }
 

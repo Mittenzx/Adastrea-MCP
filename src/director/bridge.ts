@@ -94,8 +94,8 @@ export class EditorBridge {
     }
 
     try {
-      this.editorState = (await this.directorClient.getEditorState()) ?? undefined;
-      return this.editorState ?? null;
+      this.editorState = (await this.directorClient.getEditorState()) || undefined;
+      return this.editorState || null;
     } catch (error) {
       console.error('Failed to get editor state:', error);
       return null;
@@ -190,7 +190,8 @@ export class EditorBridge {
    */
   private async syncEditorState(): Promise<void> {
     try {
-      this.editorState = (await this.directorClient?.getEditorState()) ?? undefined;
+      const state = await this.directorClient?.getEditorState();
+      this.editorState = state || undefined;
     } catch (error) {
       console.error('Failed to sync editor state:', error);
     }

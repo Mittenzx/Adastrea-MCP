@@ -34,7 +34,8 @@ const editorBridge = new EditorBridge({
 
 // Initialize bridge on startup
 editorBridge.initialize().catch((err) => {
-  console.warn('Failed to initialize Director bridge:', err);
+  console.warn('Failed to initialize Director bridge (this is expected if Adastrea-Director is not running):', err);
+  console.warn('The MCP server will continue to operate using local analysis only.');
 });
 
 // Helper function for deep merging objects
