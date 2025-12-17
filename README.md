@@ -21,6 +21,7 @@ The pre-populated data ensures AI agents have immediate context about Adastrea w
 
 ## Features
 
+### Core Features
 - **Centralized Game Project Information**: Store all details about your game project in one place
 - **MCP Resources**: Access project information through standardized MCP resources
 - **MCP Tools**: Update and manage project information using built-in tools
@@ -28,6 +29,16 @@ The pre-populated data ensures AI agents have immediate context about Adastrea w
 - **Team Management**: Track team members and their roles
 - **Timeline Tracking**: Monitor project milestones and progress
 - **Technical Documentation**: Store technical specifications and architecture details
+
+### Phase 1: Foundation Enhancement (✅ Completed)
+- **Unreal Project File Parser**: Parse `.uproject` files to extract engine version, modules, and plugins
+- **C++ Code Analysis**: Detect and catalog UCLASS, USTRUCT, UENUM, and UINTERFACE definitions
+- **Blueprint Detection**: Identify Blueprint assets and their metadata
+- **Asset Management**: Scan and categorize project assets (Meshes, Materials, Textures, etc.)
+- **Plugin Scanner**: Inventory and analyze installed plugins
+- **Build Configuration**: Detect available build configurations and target platforms
+- **Code Intelligence**: Search capabilities for classes, functions, and assets
+- **Project Validation**: Automated checks for common project structure issues
 
 ## Installation
 
@@ -55,8 +66,18 @@ Add this to your MCP client configuration (e.g., Claude Desktop, Cline, or other
 
 ### Available Resources
 
+#### Game Project Resources
 - `game://project/info` - Complete project information in JSON format
 - `game://project/summary` - Human-readable project summary
+
+#### Unreal Engine Resources (Phase 1)
+- `unreal://project/config` - Complete Unreal Engine project configuration from .uproject file
+- `unreal://project/modules` - List of all modules and their dependencies
+- `unreal://project/plugins` - Inventory of installed plugins with metadata
+- `unreal://project/classes` - All UCLASS, USTRUCT, UENUM, and UINTERFACE definitions
+- `unreal://project/blueprints` - List of all Blueprint assets in the project
+- `unreal://project/assets` - Complete asset catalog with types and paths
+- `unreal://build/config` - Available build configurations and target platforms
 
 ### Available Tools
 
@@ -106,7 +127,67 @@ Clear all game project information and start fresh.
 **Parameters:**
 - `confirm` (boolean, required): Must be set to `true` to confirm deletion
 
-## Example Workflow
+### Unreal Engine Tools (Phase 1)
+
+#### scan_unreal_project
+
+Perform a deep scan of an Unreal Engine project structure, analyzing .uproject files, modules, plugins, C++ classes, and assets.
+
+**Parameters:**
+- `project_path` (string, required): Absolute path to the Unreal Engine project directory (containing the .uproject file)
+
+**Example:**
+```json
+{
+  "project_path": "/path/to/MyUnrealProject"
+}
+```
+
+#### validate_project_structure
+
+Validate an Unreal Engine project structure and check for common issues.
+
+**Parameters:**
+- `project_path` (string, required): Absolute path to the Unreal Engine project directory
+
+#### search_code
+
+Search for C++ classes, structs, enums, or interfaces in the scanned Unreal project.
+
+**Parameters:**
+- `query` (string, required): Search query (class name, type, etc.)
+
+#### find_class_usage
+
+Find all usages of a specific C++ class in the project.
+
+**Parameters:**
+- `class_name` (string, required): Name of the class to find usages for
+
+#### get_class_hierarchy
+
+Get the inheritance hierarchy for a specific C++ class.
+
+**Parameters:**
+- `class_name` (string, required): Name of the class
+
+#### search_assets
+
+Search for assets in the scanned Unreal project by name, type, or path.
+
+**Parameters:**
+- `query` (string, required): Search query (asset name, type, or path)
+
+#### get_asset_dependencies
+
+Get dependencies for a specific asset (placeholder for future implementation).
+
+**Parameters:**
+- `asset_path` (string, required): Path to the asset
+
+## Example Workflows
+
+### Basic Project Information
 
 1. **Initialize Project Information:**
    ```
@@ -127,6 +208,47 @@ Clear all game project information and start fresh.
    - AI agents can read `game://project/info` resource
    - Get human-readable summary from `game://project/summary`
    - Use get_game_info tool for programmatic access
+
+### Unreal Engine Project Analysis (Phase 1)
+
+1. **Scan an Unreal Project:**
+   ```
+   Use scan_unreal_project with:
+   - project_path: "/path/to/MyUnrealProject"
+   ```
+   This will analyze:
+   - .uproject file and configuration
+   - All modules and their dependencies
+   - Installed plugins
+   - C++ classes (UCLASS, USTRUCT, UENUM, UINTERFACE)
+   - Blueprint assets
+   - Project assets
+
+2. **Search for Classes:**
+   ```
+   Use search_code with:
+   - query: "Character"
+   ```
+   Returns all classes matching the search term
+
+3. **Analyze Class Hierarchy:**
+   ```
+   Use get_class_hierarchy with:
+   - class_name: "AMyCharacter"
+   ```
+   Shows the full inheritance chain
+
+4. **Find Asset Usage:**
+   ```
+   Use search_assets with:
+   - query: "Material"
+   ```
+   Lists all materials in the project
+
+5. **Access Unreal Resources:**
+   - Read `unreal://project/config` for complete project configuration
+   - Read `unreal://project/classes` for all C++ classes
+   - Read `unreal://project/assets` for asset catalog
 
 ## Data Storage
 
