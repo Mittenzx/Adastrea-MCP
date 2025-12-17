@@ -3,3 +3,5 @@ build/
 *.log
 .DS_Store
 game-project-data.json
+test-project/
+test-phase1.js

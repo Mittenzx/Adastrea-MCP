@@ -11,9 +11,13 @@ import {
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
 import { GameProjectStorage, GameProject } from "./storage.js";
+import { UnrealProjectManager } from "./unreal/index.js";
 
 // Initialize storage
 const storage = new GameProjectStorage();
+
+// Initialize Unreal project manager (will be set if project path is provided)
+let unrealManager: UnrealProjectManager | null = null;
 
 // Helper function for deep merging objects
 function deepMerge(target: any, source: any): any {
@@ -83,22 +87,70 @@ const server = new Server(
 
 // List available resources
 server.setRequestHandler(ListResourcesRequestSchema, async () => {
-  return {
-    resources: [
+  const resources = [
+    {
+      uri: "game://project/info",
+      name: "Game Project Information",
+      description: "Complete information about the current game project",
+      mimeType: "application/json",
+    },
+    {
+      uri: "game://project/summary",
+      name: "Game Project Summary",
+      description: "A human-readable summary of the game project",
+      mimeType: "text/plain",
+    },
+  ];
+
+  // Add Unreal-specific resources if a project is loaded
+  if (unrealManager) {
+    resources.push(
       {
-        uri: "game://project/info",
-        name: "Game Project Information",
-        description: "Complete information about the current game project",
+        uri: "unreal://project/config",
+        name: "Unreal Project Configuration",
+        description: "Complete Unreal Engine project configuration from .uproject file",
         mimeType: "application/json",
       },
       {
-        uri: "game://project/summary",
-        name: "Game Project Summary",
-        description: "A human-readable summary of the game project",
-        mimeType: "text/plain",
+        uri: "unreal://project/modules",
+        name: "Unreal Project Modules",
+        description: "List of all modules and their dependencies",
+        mimeType: "application/json",
       },
-    ],
-  };
+      {
+        uri: "unreal://project/plugins",
+        name: "Unreal Project Plugins",
+        description: "Inventory of installed plugins",
+        mimeType: "application/json",
+      },
+      {
+        uri: "unreal://project/classes",
+        name: "C++ Class Registry",
+        description: "All UCLASS, USTRUCT, UENUM, and UINTERFACE definitions",
+        mimeType: "application/json",
+      },
+      {
+        uri: "unreal://project/blueprints",
+        name: "Blueprint Assets",
+        description: "List of all Blueprint assets in the project",
+        mimeType: "application/json",
+      },
+      {
+        uri: "unreal://project/assets",
+        name: "Asset Registry",
+        description: "Complete asset catalog with types and paths",
+        mimeType: "application/json",
+      },
+      {
+        uri: "unreal://build/config",
+        name: "Build Configurations",
+        description: "Available build configurations and target platforms",
+        mimeType: "application/json",
+      }
+    );
+  }
+
+  return { resources };
 });
 
 // Read resource content
@@ -130,6 +182,100 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
         },
       ],
     };
+  }
+
+  // Unreal Engine resources
+  if (unrealManager) {
+    if (uri === "unreal://project/config") {
+      const config = unrealManager.getProjectConfig();
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(config, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === "unreal://project/modules") {
+      const modules = unrealManager.getModules();
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(modules, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === "unreal://project/plugins") {
+      const plugins = unrealManager.getPlugins();
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(plugins, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === "unreal://project/classes") {
+      const classes = unrealManager.getClasses();
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(classes, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === "unreal://project/blueprints") {
+      const blueprints = unrealManager.getBlueprints();
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(blueprints, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === "unreal://project/assets") {
+      const assets = unrealManager.getAssets();
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(assets, null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === "unreal://build/config") {
+      const config = unrealManager.getProjectConfig();
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(config?.buildConfigurations || [], null, 2),
+          },
+        ],
+      };
+    }
   }
 
   throw new McpError(
@@ -245,6 +391,104 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["confirm"],
         },
       },
+      {
+        name: "scan_unreal_project",
+        description: "Perform a deep scan of an Unreal Engine project structure, analyzing .uproject files, modules, plugins, C++ classes, and assets",
+        inputSchema: {
+          type: "object",
+          properties: {
+            project_path: {
+              type: "string",
+              description: "Absolute path to the Unreal Engine project directory (containing the .uproject file)",
+            },
+          },
+          required: ["project_path"],
+        },
+      },
+      {
+        name: "validate_project_structure",
+        description: "Validate an Unreal Engine project structure and check for common issues",
+        inputSchema: {
+          type: "object",
+          properties: {
+            project_path: {
+              type: "string",
+              description: "Absolute path to the Unreal Engine project directory",
+            },
+          },
+          required: ["project_path"],
+        },
+      },
+      {
+        name: "search_code",
+        description: "Search for C++ classes, structs, enums, or interfaces in the scanned Unreal project",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query (class name, type, etc.)",
+            },
+          },
+          required: ["query"],
+        },
+      },
+      {
+        name: "find_class_usage",
+        description: "Find all usages of a specific C++ class in the project",
+        inputSchema: {
+          type: "object",
+          properties: {
+            class_name: {
+              type: "string",
+              description: "Name of the class to find usages for",
+            },
+          },
+          required: ["class_name"],
+        },
+      },
+      {
+        name: "get_class_hierarchy",
+        description: "Get the inheritance hierarchy for a specific C++ class",
+        inputSchema: {
+          type: "object",
+          properties: {
+            class_name: {
+              type: "string",
+              description: "Name of the class",
+            },
+          },
+          required: ["class_name"],
+        },
+      },
+      {
+        name: "search_assets",
+        description: "Search for assets in the scanned Unreal project by name, type, or path",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query (asset name, type, or path)",
+            },
+          },
+          required: ["query"],
+        },
+      },
+      {
+        name: "get_asset_dependencies",
+        description: "Get dependencies for a specific asset (placeholder for future implementation)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            asset_path: {
+              type: "string",
+              description: "Path to the asset",
+            },
+          },
+          required: ["asset_path"],
+        },
+      },
     ],
   };
 });
@@ -304,6 +548,207 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         {
           type: "text",
           text: "Game project information has been cleared.",
+        },
+      ],
+    };
+  }
+
+  // Unreal Engine tools
+  if (name === "scan_unreal_project") {
+    if (!args || !args.project_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "project_path is required"
+      );
+    }
+
+    try {
+      unrealManager = new UnrealProjectManager(args.project_path as string);
+      await unrealManager.scanProject();
+      
+      const summary = unrealManager.getProjectSummary();
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Unreal Engine project scanned successfully!\n\n${JSON.stringify(summary, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to scan project: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "validate_project_structure") {
+    if (!args || !args.project_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "project_path is required"
+      );
+    }
+
+    try {
+      unrealManager = new UnrealProjectManager(args.project_path as string);
+      const validation = await unrealManager.validateProject();
+      
+      let resultText = validation.valid 
+        ? "✅ Project structure is valid!" 
+        : "❌ Project structure has issues:";
+      
+      if (validation.issues.length > 0) {
+        resultText += "\n\n" + validation.issues.map(issue => `- ${issue}`).join("\n");
+      }
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: resultText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to validate project: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "search_code") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.query) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "query is required"
+      );
+    }
+
+    const results = unrealManager.searchClasses(args.query as string);
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Found ${results.length} matching classes:\n\n${JSON.stringify(results, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  if (name === "find_class_usage") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.class_name) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "class_name is required"
+      );
+    }
+
+    const usage = unrealManager.findClassUsage(args.class_name as string);
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Class "${args.class_name}" is used in ${usage.count} files:\n\n${usage.files.join("\n")}`,
+        },
+      ],
+    };
+  }
+
+  if (name === "get_class_hierarchy") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.class_name) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "class_name is required"
+      );
+    }
+
+    const hierarchy = unrealManager.getClassHierarchy(args.class_name as string);
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Class hierarchy for "${args.class_name}":\n\n${hierarchy.join(" -> ")}`,
+        },
+      ],
+    };
+  }
+
+  if (name === "search_assets") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.query) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "query is required"
+      );
+    }
+
+    const results = unrealManager.searchAssets(args.query as string);
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Found ${results.length} matching assets:\n\n${JSON.stringify(results, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  if (name === "get_asset_dependencies") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.asset_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "asset_path is required"
+      );
+    }
+
+    // Placeholder for future implementation
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Asset dependency tracking is planned for a future release. Currently showing basic asset info for: ${args.asset_path}`,
         },
       ],
     };
