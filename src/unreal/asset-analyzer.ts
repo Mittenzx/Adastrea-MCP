@@ -103,35 +103,36 @@ export class UnrealAssetAnalyzer {
    */
   private getAssetType(assetPath: string): string {
     const ext = path.extname(assetPath);
-    const dirName = path.dirname(assetPath).split(path.sep)[0];
+    const fileName = path.basename(assetPath, ext);
+    const dirPath = path.dirname(assetPath);
 
     // Map by extension
     if (ext === '.umap') return 'Level';
     if (ext === '.uplugin') return 'Plugin';
 
-    // Map by directory convention
-    if (dirName.includes('Blueprints') || assetPath.includes('/BP_')) {
+    // Map by directory convention and filename prefixes
+    if (dirPath.includes('Blueprints') || fileName.startsWith('BP_')) {
       return 'Blueprint';
     }
-    if (dirName.includes('Materials') || assetPath.includes('/M_')) {
+    if (dirPath.includes('Materials') || fileName.startsWith('M_')) {
       return 'Material';
     }
-    if (dirName.includes('Textures') || assetPath.includes('/T_')) {
+    if (dirPath.includes('Textures') || fileName.startsWith('T_')) {
       return 'Texture';
     }
-    if (dirName.includes('Meshes') || assetPath.includes('/SM_') || assetPath.includes('/SK_')) {
+    if (dirPath.includes('Meshes') || fileName.startsWith('SM_') || fileName.startsWith('SK_')) {
       return 'Mesh';
     }
-    if (dirName.includes('Animations') || assetPath.includes('/A_') || assetPath.includes('/AM_')) {
+    if (dirPath.includes('Animations') || fileName.startsWith('A_') || fileName.startsWith('AM_')) {
       return 'Animation';
     }
-    if (dirName.includes('Audio') || assetPath.includes('/Sound/')) {
+    if (dirPath.includes('Audio') || assetPath.includes('/Sound/')) {
       return 'Audio';
     }
-    if (dirName.includes('Particles') || assetPath.includes('/P_')) {
+    if (dirPath.includes('Particles') || fileName.startsWith('P_')) {
       return 'Particle System';
     }
-    if (dirName.includes('UI') || assetPath.includes('/W_') || assetPath.includes('/WBP_')) {
+    if (dirPath.includes('UI') || fileName.startsWith('W_') || fileName.startsWith('WBP_')) {
       return 'Widget';
     }
 

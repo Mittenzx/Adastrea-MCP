@@ -593,8 +593,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     try {
-      const parser = new UnrealProjectManager(args.project_path as string);
-      const validation = await parser.validateProject();
+      unrealManager = new UnrealProjectManager(args.project_path as string);
+      const validation = await unrealManager.validateProject();
       
       let resultText = validation.valid 
         ? "✅ Project structure is valid!" 

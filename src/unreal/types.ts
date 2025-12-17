@@ -118,9 +118,45 @@ export interface BuildConfiguration {
 export interface UnrealProjectConfig {
   projectPath: string;
   projectName: string;
-  engineVersion: string; // Engine version string (e.g., "5.3", "5.2", or custom association)
+  engineVersion: string; // Engine version / association, mirroring Unreal's "EngineAssociation" (e.g., "5.3", "5.2", a GUID like "{00000000-0000-0000-0000-000000000000}", or a custom name)
   modules: ModuleInfo[];
   plugins: PluginInfo[];
   targetPlatforms: string[];
   buildConfigurations: BuildConfiguration[];
+}
+
+export interface ProjectSummary {
+  projectName?: string;
+  engineVersion?: string;
+  modules: {
+    total: number;
+    list: string[];
+  };
+  classes: {
+    total: number;
+    byType: {
+      UCLASS: number;
+      USTRUCT: number;
+      UENUM: number;
+      UINTERFACE: number;
+    };
+  };
+  functions: {
+    total: number;
+    blueprintCallable: number;
+  };
+  assets: {
+    total: number;
+    byType: Record<string, number>;
+    totalSize: number;
+  };
+  blueprints: {
+    total: number;
+  };
+  plugins: {
+    total: number;
+    enabled: number;
+    categories: Record<string, number>;
+  };
+  platforms: string[];
 }

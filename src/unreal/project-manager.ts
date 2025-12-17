@@ -14,7 +14,8 @@ import {
   AssetInfo,
   BlueprintAsset,
   PluginInfo,
-  ModuleInfo
+  ModuleInfo,
+  ProjectSummary
 } from './types.js';
 
 export class UnrealProjectManager {
@@ -194,7 +195,7 @@ export class UnrealProjectManager {
   /**
    * Get project summary
    */
-  getProjectSummary(): any {
+  getProjectSummary(): ProjectSummary {
     const assetStats = this.assetAnalyzer.getAssetStatistics();
     const pluginStats = this.pluginScanner.getPluginStatistics();
 

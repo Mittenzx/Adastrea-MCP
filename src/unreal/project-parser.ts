@@ -103,9 +103,9 @@ export class UnrealProjectParser {
    * Detect available build configurations
    */
   private detectBuildConfigurations(projectData: UProjectFile): BuildConfiguration[] {
-    const configurations: any[] = [];
+    const configurations: BuildConfiguration[] = [];
     const platforms = projectData.TargetPlatforms || ['Windows'];
-    const buildTypes = ['Development', 'Shipping', 'DebugGame'];
+    const buildTypes: Array<'Debug' | 'DebugGame' | 'Development' | 'Shipping' | 'Test'> = ['Development', 'Shipping', 'DebugGame'];
 
     for (const platform of platforms) {
       for (const buildType of buildTypes) {
