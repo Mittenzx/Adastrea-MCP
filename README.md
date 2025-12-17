@@ -40,6 +40,14 @@ The pre-populated data ensures AI agents have immediate context about Adastrea w
 - **Code Intelligence**: Search capabilities for classes, functions, and assets
 - **Project Validation**: Automated checks for common project structure issues
 
+### Phase 2.1: Editor Communication Layer (✅ Completed)
+- **Adastrea-Director Integration**: Seamless connection to [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) plugin
+- **Live Editor State**: Real-time access to UE Editor state and current level information
+- **Console Command Execution**: Run UE console commands remotely via MCP
+- **Python Script Execution**: Execute Python code in UE Editor's embedded interpreter
+- **Live Asset Management**: Real-time asset list with fallback to local cache
+- **Graceful Degradation**: Automatic fallback to local analysis when Director unavailable
+
 ## Installation
 
 ```bash
@@ -78,6 +86,10 @@ Add this to your MCP client configuration (e.g., Claude Desktop, Cline, or other
 - `unreal://project/blueprints` - List of all Blueprint assets in the project
 - `unreal://project/assets` - Complete asset catalog with types and paths
 - `unreal://build/config` - Available build configurations and target platforms
+
+#### Editor Integration Resources (Phase 2.1)
+- `unreal://editor/state` - Current state of UE Editor (requires Adastrea-Director)
+- `unreal://editor/capabilities` - Available capabilities based on Director connection status
 
 ### Available Tools
 
@@ -185,6 +197,56 @@ Get dependencies for a specific asset (placeholder for future implementation).
 **Parameters:**
 - `asset_path` (string, required): Path to the asset
 
+### Editor Integration Tools (Phase 2.1)
+
+#### execute_console_command
+
+Execute a console command in the running Unreal Engine Editor via Adastrea-Director.
+
+**Parameters:**
+- `command` (string, required): Console command to execute (e.g., 'stat fps', 'ke * list')
+
+**Example:**
+```json
+{
+  "command": "stat fps"
+}
+```
+
+#### run_python_script
+
+Execute Python code in the Unreal Engine Editor's embedded Python interpreter.
+
+**Parameters:**
+- `code` (string, required): Python code to execute in the UE Editor
+
+**Example:**
+```json
+{
+  "code": "import unreal\nprint(unreal.SystemLibrary.get_project_directory())"
+}
+```
+
+#### get_live_project_info
+
+Get live project information from the running UE Editor. Prefers live data from Adastrea-Director over cached local data.
+
+**Parameters:** None
+
+#### list_assets_live
+
+List assets from the running UE Editor in real-time. Prefers live data from Adastrea-Director over cached local data.
+
+**Parameters:**
+- `filter` (string, optional): Optional filter string to search for specific assets
+
+**Example:**
+```json
+{
+  "filter": "Material"
+}
+```
+
 ## Example Workflows
 
 ### Basic Project Information
@@ -249,6 +311,42 @@ Get dependencies for a specific asset (placeholder for future implementation).
    - Read `unreal://project/config` for complete project configuration
    - Read `unreal://project/classes` for all C++ classes
    - Read `unreal://project/assets` for asset catalog
+
+### Live Editor Integration (Phase 2.1)
+
+1. **Check Director Connection:**
+   ```
+   Read unreal://editor/capabilities to verify:
+   - Director is connected
+   - Editor commands available
+   - Python execution available
+   ```
+
+2. **Execute Console Commands:**
+   ```
+   Use execute_console_command with:
+   - command: "stat fps"
+   Opens FPS counter in editor
+   ```
+
+3. **Run Python Scripts:**
+   ```
+   Use run_python_script with:
+   - code: "import unreal\nprint(unreal.EditorLevelLibrary.get_all_level_actors())"
+   Lists all actors in current level
+   ```
+
+4. **Get Live Asset List:**
+   ```
+   Use list_assets_live with:
+   - filter: "Blueprint"
+   Gets real-time list of Blueprint assets from editor
+   ```
+
+5. **Access Editor State:**
+   - Read `unreal://editor/state` for current editor context
+   - Get current level, selected actors, viewport state
+   - Use for context-aware suggestions
 
 ## Data Storage
 
