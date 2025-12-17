@@ -118,8 +118,7 @@ export interface BuildConfiguration {
 export interface UnrealProjectConfig {
   projectPath: string;
   projectName: string;
-  engineVersion: string;
-  engineAssociation: string;
+  engineVersion: string; // Engine version string (e.g., "5.3", "5.2", or custom association)
   modules: ModuleInfo[];
   plugins: PluginInfo[];
   targetPlatforms: string[];

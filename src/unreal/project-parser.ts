@@ -5,7 +5,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { UProjectFile, UnrealProjectConfig, ModuleInfo, PluginInfo } from './types.js';
+import { UProjectFile, UnrealProjectConfig, ModuleInfo, PluginInfo, BuildConfiguration } from './types.js';
 
 export class UnrealProjectParser {
   private projectPath: string;
@@ -92,7 +92,6 @@ export class UnrealProjectParser {
       projectPath: this.projectPath,
       projectName,
       engineVersion: projectData.EngineAssociation,
-      engineAssociation: projectData.EngineAssociation,
       modules,
       plugins,
       targetPlatforms: projectData.TargetPlatforms || ['Windows'],
@@ -103,7 +102,7 @@ export class UnrealProjectParser {
   /**
    * Detect available build configurations
    */
-  private detectBuildConfigurations(projectData: UProjectFile): any[] {
+  private detectBuildConfigurations(projectData: UProjectFile): BuildConfiguration[] {
     const configurations: any[] = [];
     const platforms = projectData.TargetPlatforms || ['Windows'];
     const buildTypes = ['Development', 'Shipping', 'DebugGame'];
