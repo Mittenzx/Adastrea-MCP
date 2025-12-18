@@ -18,8 +18,6 @@ import {
   BlueprintVariable,
   BlueprintFunction,
   BlueprintNode,
-  BlueprintGraph,
-  BlueprintFunctionParameter,
 } from './types.js';
 
 export class BlueprintInspector {
@@ -40,7 +38,26 @@ export class BlueprintInspector {
       return this.blueprintCache.get(blueprintPath)!;
     }
 
-    const fullPath = path.join(this.projectPath, 'Content', blueprintPath);
+    // Normalize and resolve the blueprint path to an absolute filesystem path
+    const normalizedBlueprintPath = path
+      .normalize(blueprintPath)
+      .replace(/^[\\/]+/u, ''); // strip leading path separators
+
+    let fullPath: string;
+
+    if (path.isAbsolute(blueprintPath)) {
+      // If the caller provided an absolute path, use it as-is
+      fullPath = path.normalize(blueprintPath);
+    } else if (
+      normalizedBlueprintPath === 'Content' ||
+      normalizedBlueprintPath.startsWith(`Content${path.sep}`)
+    ) {
+      // Path is already relative to the Content directory
+      fullPath = path.join(this.projectPath, normalizedBlueprintPath);
+    } else {
+      // Default: treat as relative to the Content directory
+      fullPath = path.join(this.projectPath, 'Content', normalizedBlueprintPath);
+    }
     
     // Check if the file exists
     try {

@@ -10,7 +10,6 @@
 import {
   BlueprintVariable,
   BlueprintFunction,
-  BlueprintFunctionParameter,
 } from './types.js';
 
 export interface BlueprintModificationResult {
@@ -224,12 +223,12 @@ export class BlueprintModifier {
       return { valid: false, error: 'Variable type is required' };
     }
 
-    // Check for valid variable name (alphanumeric and underscores)
-    if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(variable.name)) {
+    // Check for valid variable name (must start with a letter, then alphanumeric and underscores)
+    if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(variable.name)) {
       return {
         valid: false,
         error:
-          'Variable name must start with a letter or underscore and contain only alphanumeric characters and underscores',
+          'Variable name must start with a letter and contain only alphanumeric characters and underscores',
       };
     }
 
@@ -246,12 +245,12 @@ export class BlueprintModifier {
       return { valid: false, error: 'Function name is required' };
     }
 
-    // Check for valid function name (alphanumeric and underscores)
-    if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(func.name)) {
+    // Check for valid function name (must start with a letter, then alphanumeric and underscores)
+    if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(func.name)) {
       return {
         valid: false,
         error:
-          'Function name must start with a letter or underscore and contain only alphanumeric characters and underscores',
+          'Function name must start with a letter and contain only alphanumeric characters and underscores',
       };
     }
 
@@ -268,6 +267,13 @@ export class BlueprintModifier {
           return {
             valid: false,
             error: `Parameter type is required for parameter: ${param.name}`,
+          };
+        }
+        // Validate parameter names follow the same naming convention
+        if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(param.name)) {
+          return {
+            valid: false,
+            error: `Parameter name '${param.name}' must start with a letter and contain only alphanumeric characters and underscores`,
           };
         }
       }

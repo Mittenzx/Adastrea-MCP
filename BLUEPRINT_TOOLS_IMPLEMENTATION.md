@@ -171,8 +171,8 @@ Manual testing requires:
 ## Files Changed
 
 ### New Files
-- `src/unreal/blueprint-inspector.ts` (217 lines)
-- `src/unreal/blueprint-modifier.ts` (278 lines)
+- `src/unreal/blueprint-inspector.ts` (248 lines)
+- `src/unreal/blueprint-modifier.ts` (291 lines)
 
 ### Modified Files
 - `src/unreal/types.ts` - Added 9 new interfaces for Blueprint structures
