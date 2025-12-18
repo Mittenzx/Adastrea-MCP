@@ -9,3 +9,5 @@ export * from './code-analyzer.js';
 export * from './asset-analyzer.js';
 export * from './plugin-scanner.js';
 export * from './project-manager.js';
+export * from './blueprint-inspector.js';
+export * from './blueprint-modifier.js';

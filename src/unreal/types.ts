@@ -70,6 +70,87 @@ export interface BlueprintAsset {
   functions?: string[];
 }
 
+// Detailed Blueprint structures for inspection and modification
+export interface BlueprintVariable {
+  name: string;
+  type: string;
+  category?: string;
+  defaultValue?: any;
+  isExposed?: boolean; // Exposed to cinematics/blueprints
+  isEditable?: boolean; // Editable on instance
+  tooltip?: string;
+  replication?: 'None' | 'Replicated' | 'ReplicatedUsing';
+  replicationCondition?: string;
+}
+
+export interface BlueprintFunctionParameter {
+  name: string;
+  type: string;
+  isReference?: boolean;
+  isConst?: boolean;
+  defaultValue?: any;
+}
+
+export interface BlueprintFunction {
+  name: string;
+  category?: string;
+  returnType?: string;
+  parameters: BlueprintFunctionParameter[];
+  isEvent?: boolean;
+  isPure?: boolean;
+  isConst?: boolean;
+  accessSpecifier?: 'Public' | 'Protected' | 'Private';
+  keywords?: string[]; // BlueprintCallable, BlueprintPure, etc.
+  tooltip?: string;
+  nodes?: BlueprintNode[];
+}
+
+export interface BlueprintNode {
+  id: string;
+  type: string; // Node type (FunctionCall, VariableGet, Branch, etc.)
+  className?: string; // For function calls
+  functionName?: string; // For function calls
+  variableName?: string; // For variable access
+  position?: { x: number; y: number };
+  pins?: BlueprintPin[];
+}
+
+export interface BlueprintPin {
+  id: string;
+  name: string;
+  type: string;
+  direction: 'Input' | 'Output';
+  isExecution?: boolean; // Execution pin vs data pin
+  defaultValue?: any;
+  connections?: string[]; // IDs of connected pins
+}
+
+export interface BlueprintGraph {
+  name: string;
+  type: 'EventGraph' | 'Function' | 'Macro' | 'ConstructionScript';
+  nodes: BlueprintNode[];
+}
+
+export interface DetailedBlueprintInfo {
+  name: string;
+  path: string;
+  parentClass?: string;
+  interfaces?: string[];
+  variables: BlueprintVariable[];
+  functions: BlueprintFunction[];
+  graphs: BlueprintGraph[];
+  components?: Array<{
+    name: string;
+    type: string;
+    attachedTo?: string;
+  }>;
+  metadata?: {
+    category?: string;
+    description?: string;
+    keywords?: string[];
+  };
+}
+
 export interface AssetInfo {
   name: string;
   path: string;

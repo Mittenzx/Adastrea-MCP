@@ -7,6 +7,8 @@ import { UnrealProjectParser } from './project-parser.js';
 import { UnrealCodeAnalyzer } from './code-analyzer.js';
 import { UnrealAssetAnalyzer } from './asset-analyzer.js';
 import { UnrealPluginScanner } from './plugin-scanner.js';
+import { BlueprintInspector } from './blueprint-inspector.js';
+import { BlueprintModifier } from './blueprint-modifier.js';
 import {
   UnrealProjectConfig,
   UnrealClass,
@@ -15,7 +17,11 @@ import {
   BlueprintAsset,
   PluginInfo,
   ModuleInfo,
-  ProjectSummary
+  ProjectSummary,
+  DetailedBlueprintInfo,
+  BlueprintVariable,
+  BlueprintFunction as BlueprintFunctionType,
+  BlueprintNode,
 } from './types.js';
 
 export class UnrealProjectManager {
@@ -24,6 +30,8 @@ export class UnrealProjectManager {
   private codeAnalyzer: UnrealCodeAnalyzer;
   private assetAnalyzer: UnrealAssetAnalyzer;
   private pluginScanner: UnrealPluginScanner;
+  private blueprintInspector: BlueprintInspector;
+  private blueprintModifier: BlueprintModifier;
   
   private config?: UnrealProjectConfig;
   private classes: UnrealClass[] = [];
@@ -37,6 +45,8 @@ export class UnrealProjectManager {
     this.codeAnalyzer = new UnrealCodeAnalyzer(projectPath);
     this.assetAnalyzer = new UnrealAssetAnalyzer(projectPath);
     this.pluginScanner = new UnrealPluginScanner(projectPath);
+    this.blueprintInspector = new BlueprintInspector(projectPath);
+    this.blueprintModifier = new BlueprintModifier(projectPath);
   }
 
   /**
@@ -234,5 +244,88 @@ export class UnrealProjectManager {
       },
       platforms: this.config?.targetPlatforms || []
     };
+  }
+
+  // Blueprint Inspection Methods
+
+  /**
+   * Inspect a Blueprint and return detailed information
+   */
+  async inspectBlueprint(blueprintPath: string): Promise<DetailedBlueprintInfo> {
+    return await this.blueprintInspector.inspectBlueprint(blueprintPath);
+  }
+
+  /**
+   * Get all variables from a Blueprint
+   */
+  async getBlueprintVariables(blueprintPath: string): Promise<BlueprintVariable[]> {
+    return await this.blueprintInspector.getBlueprintVariables(blueprintPath);
+  }
+
+  /**
+   * Get all functions from a Blueprint
+   */
+  async getBlueprintFunctions(blueprintPath: string): Promise<BlueprintFunctionType[]> {
+    return await this.blueprintInspector.getBlueprintFunctions(blueprintPath);
+  }
+
+  /**
+   * Search for specific node types within a Blueprint
+   */
+  async searchBlueprintNodes(blueprintPath: string, nodeType?: string): Promise<BlueprintNode[]> {
+    return await this.blueprintInspector.searchBlueprintNodes(blueprintPath, nodeType);
+  }
+
+  /**
+   * Search for Blueprints matching a query
+   */
+  searchBlueprints(query: string): BlueprintAsset[] {
+    const blueprints = this.getBlueprints();
+    return this.blueprintInspector.searchBlueprints(blueprints, query);
+  }
+
+  /**
+   * Get Blueprint statistics
+   */
+  getBlueprintStatistics() {
+    const blueprints = this.getBlueprints();
+    return this.blueprintInspector.getBlueprintStatistics(blueprints);
+  }
+
+  // Blueprint Modification Methods
+
+  /**
+   * Add a new variable to a Blueprint
+   */
+  async addBlueprintVariable(blueprintPath: string, variable: BlueprintVariable) {
+    return await this.blueprintModifier.addBlueprintVariable(blueprintPath, variable);
+  }
+
+  /**
+   * Add a new function to a Blueprint
+   */
+  async addBlueprintFunction(blueprintPath: string, functionDef: BlueprintFunctionType) {
+    return await this.blueprintModifier.addBlueprintFunction(blueprintPath, functionDef);
+  }
+
+  /**
+   * Modify a Blueprint property (variable default value)
+   */
+  async modifyBlueprintProperty(blueprintPath: string, propertyName: string, newValue: any) {
+    return await this.blueprintModifier.modifyBlueprintProperty(blueprintPath, propertyName, newValue);
+  }
+
+  /**
+   * Execute a UE Editor command for advanced Blueprint manipulation
+   */
+  async executeBlueprintCommand(command: string) {
+    return await this.blueprintModifier.executeBlueprintCommand(command);
+  }
+
+  /**
+   * Set the Director bridge for Blueprint modifications
+   */
+  setDirectorBridge(bridge: any): void {
+    this.blueprintModifier.setDirectorBridge(bridge);
   }
 }
