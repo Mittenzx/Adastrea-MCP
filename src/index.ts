@@ -625,6 +625,190 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
         },
       },
+      {
+        name: "inspect_blueprint",
+        description: "Get full Blueprint structure including variables, functions, graphs, and components",
+        inputSchema: {
+          type: "object",
+          properties: {
+            blueprint_path: {
+              type: "string",
+              description: "Relative path to the Blueprint asset (e.g., 'Blueprints/BP_Character.uasset')",
+            },
+          },
+          required: ["blueprint_path"],
+        },
+      },
+      {
+        name: "search_blueprint_nodes",
+        description: "Find specific node types within a Blueprint (e.g., FunctionCall, Branch, ForLoop)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            blueprint_path: {
+              type: "string",
+              description: "Relative path to the Blueprint asset",
+            },
+            node_type: {
+              type: "string",
+              description: "Optional node type to search for (e.g., 'FunctionCall', 'Branch', 'ForLoop')",
+            },
+          },
+          required: ["blueprint_path"],
+        },
+      },
+      {
+        name: "get_blueprint_variables",
+        description: "List all variables in a Blueprint with their types, categories, and properties",
+        inputSchema: {
+          type: "object",
+          properties: {
+            blueprint_path: {
+              type: "string",
+              description: "Relative path to the Blueprint asset",
+            },
+          },
+          required: ["blueprint_path"],
+        },
+      },
+      {
+        name: "get_blueprint_functions",
+        description: "List all functions in a Blueprint with their signatures, parameters, and properties",
+        inputSchema: {
+          type: "object",
+          properties: {
+            blueprint_path: {
+              type: "string",
+              description: "Relative path to the Blueprint asset",
+            },
+          },
+          required: ["blueprint_path"],
+        },
+      },
+      {
+        name: "add_blueprint_variable",
+        description: "Add a new variable to a Blueprint (requires Adastrea-Director integration)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            blueprint_path: {
+              type: "string",
+              description: "Relative path to the Blueprint asset",
+            },
+            variable: {
+              type: "object",
+              description: "Variable definition",
+              properties: {
+                name: {
+                  type: "string",
+                  description: "Variable name",
+                },
+                type: {
+                  type: "string",
+                  description: "Variable type (e.g., 'int32', 'float', 'FString', 'AActor*')",
+                },
+                category: {
+                  type: "string",
+                  description: "Optional category for organization",
+                },
+                defaultValue: {
+                  description: "Optional default value",
+                },
+                isExposed: {
+                  type: "boolean",
+                  description: "Whether the variable is exposed to cinematics",
+                },
+                isEditable: {
+                  type: "boolean",
+                  description: "Whether the variable is editable on instances",
+                },
+                tooltip: {
+                  type: "string",
+                  description: "Optional tooltip description",
+                },
+              },
+              required: ["name", "type"],
+            },
+          },
+          required: ["blueprint_path", "variable"],
+        },
+      },
+      {
+        name: "add_blueprint_function",
+        description: "Create a new function in a Blueprint (requires Adastrea-Director integration)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            blueprint_path: {
+              type: "string",
+              description: "Relative path to the Blueprint asset",
+            },
+            function: {
+              type: "object",
+              description: "Function definition",
+              properties: {
+                name: {
+                  type: "string",
+                  description: "Function name",
+                },
+                category: {
+                  type: "string",
+                  description: "Optional category for organization",
+                },
+                returnType: {
+                  type: "string",
+                  description: "Optional return type",
+                },
+                parameters: {
+                  type: "array",
+                  description: "Function parameters",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string" },
+                      type: { type: "string" },
+                      isReference: { type: "boolean" },
+                      defaultValue: {},
+                    },
+                    required: ["name", "type"],
+                  },
+                },
+                isPure: {
+                  type: "boolean",
+                  description: "Whether the function is pure (no side effects)",
+                },
+                tooltip: {
+                  type: "string",
+                  description: "Optional tooltip description",
+                },
+              },
+              required: ["name", "parameters"],
+            },
+          },
+          required: ["blueprint_path", "function"],
+        },
+      },
+      {
+        name: "modify_blueprint_property",
+        description: "Change the default value of a Blueprint variable (requires Adastrea-Director integration)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            blueprint_path: {
+              type: "string",
+              description: "Relative path to the Blueprint asset",
+            },
+            property_name: {
+              type: "string",
+              description: "Name of the property/variable to modify",
+            },
+            new_value: {
+              description: "New default value for the property",
+            },
+          },
+          required: ["blueprint_path", "property_name", "new_value"],
+        },
+      },
     ],
   };
 });
@@ -961,6 +1145,263 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       () => editorBridge.listAssets(filter),
       "Failed to list assets"
     );
+  }
+
+  // Blueprint Inspection Tools
+  if (name === "inspect_blueprint") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.blueprint_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "blueprint_path is required"
+      );
+    }
+
+    try {
+      const blueprintInfo = await unrealManager.inspectBlueprint(args.blueprint_path as string);
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(blueprintInfo, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to inspect blueprint: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "search_blueprint_nodes") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.blueprint_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "blueprint_path is required"
+      );
+    }
+
+    try {
+      const nodeType = args.node_type as string | undefined;
+      const nodes = await unrealManager.searchBlueprintNodes(
+        args.blueprint_path as string,
+        nodeType
+      );
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Found ${nodes.length} node(s)${nodeType ? ` of type "${nodeType}"` : ''}:\n\n${JSON.stringify(nodes, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to search blueprint nodes: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "get_blueprint_variables") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.blueprint_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "blueprint_path is required"
+      );
+    }
+
+    try {
+      const variables = await unrealManager.getBlueprintVariables(args.blueprint_path as string);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Blueprint has ${variables.length} variable(s):\n\n${JSON.stringify(variables, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to get blueprint variables: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "get_blueprint_functions") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.blueprint_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "blueprint_path is required"
+      );
+    }
+
+    try {
+      const functions = await unrealManager.getBlueprintFunctions(args.blueprint_path as string);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Blueprint has ${functions.length} function(s):\n\n${JSON.stringify(functions, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to get blueprint functions: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  // Blueprint Modification Tools
+  if (name === "add_blueprint_variable") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.blueprint_path || !args.variable) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "blueprint_path and variable are required"
+      );
+    }
+
+    try {
+      const result = await unrealManager.addBlueprintVariable(
+        args.blueprint_path as string,
+        args.variable as any
+      );
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.success 
+              ? `✅ ${result.message}` 
+              : `⚠️ ${result.message}\n\nDetails: ${JSON.stringify(result.details, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to add blueprint variable: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "add_blueprint_function") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.blueprint_path || !args.function) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "blueprint_path and function are required"
+      );
+    }
+
+    try {
+      const result = await unrealManager.addBlueprintFunction(
+        args.blueprint_path as string,
+        args.function as any
+      );
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.success 
+              ? `✅ ${result.message}` 
+              : `⚠️ ${result.message}\n\nDetails: ${JSON.stringify(result.details, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to add blueprint function: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "modify_blueprint_property") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.blueprint_path || !args.property_name || args.new_value === undefined) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "blueprint_path, property_name, and new_value are required"
+      );
+    }
+
+    try {
+      const result = await unrealManager.modifyBlueprintProperty(
+        args.blueprint_path as string,
+        args.property_name as string,
+        args.new_value
+      );
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.success 
+              ? `✅ ${result.message}` 
+              : `⚠️ ${result.message}\n\nDetails: ${JSON.stringify(result.details, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to modify blueprint property: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
   throw new McpError(
