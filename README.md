@@ -48,6 +48,21 @@ The pre-populated data ensures AI agents have immediate context about Adastrea w
 - **Live Asset Management**: Real-time asset list with fallback to local cache
 - **Graceful Degradation**: Automatic fallback to local analysis when Director unavailable
 
+### Phase 2.2: Blueprint Interaction Tools (✅ Completed)
+- **Blueprint Inspection**: Deep inspection of Blueprint structure, variables, functions, and graphs
+- **Blueprint Node Search**: Find specific node types within Blueprints
+- **Blueprint Modification**: Add variables and functions, modify properties (requires Director)
+- **Component Analysis**: Inspect Blueprint component hierarchies
+- **Graph Analysis**: Analyze Blueprint event graphs and function graphs
+
+### Phase 2.3: Actor & Component System (✅ Completed)
+- **Level Actor Registry**: List and search actors in the current level
+- **Actor Spawning**: Create new actors programmatically with full configuration
+- **Actor Modification**: Modify actor properties, transforms, and tags
+- **Component Inspection**: Analyze actor component hierarchies and relationships
+- **Actor Templates**: Save and reuse common actor configurations
+- **Template Management**: Create, list, instantiate, and manage actor templates
+
 ## Installation
 
 ```bash
@@ -90,6 +105,9 @@ Add this to your MCP client configuration (e.g., Claude Desktop, Cline, or other
 #### Editor Integration Resources (Phase 2.1)
 - `unreal://editor/state` - Current state of UE Editor (requires Adastrea-Director)
 - `unreal://editor/capabilities` - Available capabilities based on Director connection status
+
+#### Actor & Component Resources (Phase 2.3)
+- `unreal://level/actors` - All actors in the current level with component hierarchies
 
 ### Available Tools
 
@@ -262,6 +280,139 @@ List assets from the running UE Editor in real-time. Prefers live data from Adas
 }
 ```
 
+### Actor & Component Tools (Phase 2.3)
+
+#### spawn_actor
+
+Spawn a new actor in the current level (requires Adastrea-Director integration).
+
+**Parameters:**
+- `className` (string, required): Actor class to spawn (e.g., 'AStaticMeshActor', '/Game/Blueprints/BP_Character.BP_Character_C')
+- `location` (object, optional): World location {x, y, z}
+- `rotation` (object, optional): World rotation {pitch, yaw, roll}
+- `scale` (object, optional): World scale {x, y, z}
+- `name` (string, optional): Custom name for the actor instance
+- `properties` (object, optional): Initial property values
+- `tags` (array, optional): Tags to assign to the actor
+- `folder` (string, optional): Level folder to place actor in
+
+**Example:**
+```json
+{
+  "className": "AStaticMeshActor",
+  "location": {"x": 0, "y": 0, "z": 100},
+  "rotation": {"pitch": 0, "yaw": 0, "roll": 0},
+  "name": "MyStaticMesh"
+}
+```
+
+#### modify_actor_properties
+
+Modify properties of an existing actor in the level (requires Adastrea-Director integration).
+
+**Parameters:**
+- `actorPath` (string, required): Full path to the actor
+- `properties` (object, optional): Properties to modify
+- `transform` (object, optional): Transform modifications (location, rotation, scale)
+- `tags` (array, optional): Tags to assign
+
+**Example:**
+```json
+{
+  "actorPath": "/Game/Maps/MainLevel.MainLevel:PersistentLevel.Actor_0",
+  "transform": {
+    "location": {"x": 100, "y": 200, "z": 50}
+  },
+  "properties": {
+    "bHidden": false
+  }
+}
+```
+
+#### get_actor_components
+
+Get the component hierarchy for an actor.
+
+**Parameters:**
+- `actorPath` (string, required): Full path to the actor
+
+**Example:**
+```json
+{
+  "actorPath": "/Game/Maps/MainLevel.MainLevel:PersistentLevel.Actor_0"
+}
+```
+
+#### create_actor_template
+
+Save an actor as a reusable template.
+
+**Parameters:**
+- `actorPath` (string, required): Path to the actor to save as template
+- `templateName` (string, required): Name for the template
+- `description` (string, optional): Description of the template
+- `category` (string, optional): Category for organization
+- `tags` (array, optional): Tags for the template
+
+**Example:**
+```json
+{
+  "actorPath": "/Game/Maps/MainLevel.MainLevel:PersistentLevel.Actor_0",
+  "templateName": "Lamp Post Standard",
+  "category": "Environment",
+  "tags": ["lighting", "street"]
+}
+```
+
+#### list_actor_templates
+
+List all available actor templates.
+
+**Parameters:**
+- `category` (string, optional): Filter by category
+- `tags` (array, optional): Filter by tags
+
+**Example:**
+```json
+{
+  "category": "Environment"
+}
+```
+
+#### instantiate_template
+
+Create an actor from a template (requires Adastrea-Director integration).
+
+**Parameters:**
+- `templateId` (string, required): ID of the template to instantiate
+- `location` (object, optional): World location
+- `rotation` (object, optional): World rotation
+- `scale` (object, optional): World scale
+- `name` (string, optional): Custom name for the spawned actor
+- `folder` (string, optional): Level folder
+
+**Example:**
+```json
+{
+  "templateId": "template_1234567890_abc123xyz",
+  "location": {"x": 500, "y": 300, "z": 0}
+}
+```
+
+#### delete_actor_template
+
+Delete an actor template.
+
+**Parameters:**
+- `templateId` (string, required): ID of the template to delete
+
+**Example:**
+```json
+{
+  "templateId": "template_1234567890_abc123xyz"
+}
+```
+
 ## Example Workflows
 
 ### Basic Project Information
@@ -363,9 +514,61 @@ List assets from the running UE Editor in real-time. Prefers live data from Adas
    - Get current level, selected actors, viewport state
    - Use for context-aware suggestions
 
+### Actor & Component Management (Phase 2.3)
+
+1. **List Actors in Level:**
+   ```
+   Read unreal://level/actors to get:
+   - All actors in current level
+   - Actor locations, rotations, scales
+   - Component hierarchies
+   ```
+
+2. **Spawn New Actors:**
+   ```
+   Use spawn_actor with:
+   - className: "AStaticMeshActor"
+   - location: {x: 0, y: 0, z: 100}
+   Creates a new static mesh actor at specified location
+   ```
+
+3. **Modify Actor Properties:**
+   ```
+   Use modify_actor_properties with:
+   - actorPath: "/Game/Maps/MainLevel.MainLevel:PersistentLevel.Actor_0"
+   - transform: {location: {x: 100, y: 200, z: 50}}
+   Moves the actor to a new location
+   ```
+
+4. **Inspect Component Hierarchy:**
+   ```
+   Use get_actor_components with:
+   - actorPath: "/Game/Maps/MainLevel.MainLevel:PersistentLevel.Actor_0"
+   Returns tree structure of all components
+   ```
+
+5. **Work with Actor Templates:**
+   ```
+   # Save an actor as a template
+   Use create_actor_template with:
+   - actorPath: "/Game/Maps/MainLevel.MainLevel:PersistentLevel.MyActor"
+   - templateName: "Lamp Post Standard"
+   - category: "Environment"
+   
+   # List available templates
+   Use list_actor_templates with:
+   - category: "Environment"
+   
+   # Instantiate from template
+   Use instantiate_template with:
+   - templateId: "template_1234567890_abc123xyz"
+   - location: {x: 500, y: 300, z: 0}
+   ```
+
 ## Data Storage
 
-Project information is stored in `game-project-data.json` in the package root directory. This file is automatically created when you first update project information.
+- **Project Information**: Stored in `game-project-data.json` in the package root directory. This file is automatically created when you first update project information.
+- **Actor Templates**: Stored in `.adastrea/actor-templates.json` in the project root directory. This file is automatically created when you create your first actor template.
 
 ## Benefits for AI Agents
 

@@ -188,6 +188,12 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
         name: "Build Configurations",
         description: "Available build configurations and target platforms",
         mimeType: "application/json",
+      },
+      {
+        uri: "unreal://level/actors",
+        name: "Level Actors",
+        description: "All actors in the current level with component hierarchies",
+        mimeType: "application/json",
       }
     );
   }
@@ -332,6 +338,19 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
             uri,
             mimeType: "application/json",
             text: JSON.stringify(config?.buildConfigurations || [], null, 2),
+          },
+        ],
+      };
+    }
+
+    if (uri === "unreal://level/actors") {
+      const actorsResponse = await unrealManager.getActorsInLevel();
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(actorsResponse, null, 2),
           },
         ],
       };
@@ -807,6 +826,243 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ["blueprint_path", "property_name", "new_value"],
+        },
+      },
+      {
+        name: "spawn_actor",
+        description: "Spawn a new actor in the current level (requires Adastrea-Director integration)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            className: {
+              type: "string",
+              description: "Actor class to spawn (e.g., 'AStaticMeshActor', '/Game/Blueprints/BP_Character.BP_Character_C')",
+            },
+            location: {
+              type: "object",
+              description: "World location to spawn the actor",
+              properties: {
+                x: { type: "number" },
+                y: { type: "number" },
+                z: { type: "number" },
+              },
+            },
+            rotation: {
+              type: "object",
+              description: "World rotation for the actor",
+              properties: {
+                pitch: { type: "number" },
+                yaw: { type: "number" },
+                roll: { type: "number" },
+              },
+            },
+            scale: {
+              type: "object",
+              description: "World scale for the actor",
+              properties: {
+                x: { type: "number" },
+                y: { type: "number" },
+                z: { type: "number" },
+              },
+            },
+            name: {
+              type: "string",
+              description: "Optional custom name for the actor instance",
+            },
+            properties: {
+              type: "object",
+              description: "Initial property values for the actor",
+            },
+            tags: {
+              type: "array",
+              items: { type: "string" },
+              description: "Tags to assign to the actor",
+            },
+            folder: {
+              type: "string",
+              description: "Level folder to place actor in",
+            },
+          },
+          required: ["className"],
+        },
+      },
+      {
+        name: "modify_actor_properties",
+        description: "Modify properties of an existing actor in the level (requires Adastrea-Director integration)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            actorPath: {
+              type: "string",
+              description: "Full path to the actor (e.g., '/Game/Maps/MainLevel.MainLevel:PersistentLevel.Actor_0')",
+            },
+            properties: {
+              type: "object",
+              description: "Properties to modify with their new values",
+            },
+            transform: {
+              type: "object",
+              description: "Transform modifications",
+              properties: {
+                location: {
+                  type: "object",
+                  properties: {
+                    x: { type: "number" },
+                    y: { type: "number" },
+                    z: { type: "number" },
+                  },
+                },
+                rotation: {
+                  type: "object",
+                  properties: {
+                    pitch: { type: "number" },
+                    yaw: { type: "number" },
+                    roll: { type: "number" },
+                  },
+                },
+                scale: {
+                  type: "object",
+                  properties: {
+                    x: { type: "number" },
+                    y: { type: "number" },
+                    z: { type: "number" },
+                  },
+                },
+              },
+            },
+            tags: {
+              type: "array",
+              items: { type: "string" },
+              description: "Tags to assign to the actor",
+            },
+          },
+          required: ["actorPath"],
+        },
+      },
+      {
+        name: "get_actor_components",
+        description: "Get component hierarchy for an actor",
+        inputSchema: {
+          type: "object",
+          properties: {
+            actorPath: {
+              type: "string",
+              description: "Full path to the actor",
+            },
+          },
+          required: ["actorPath"],
+        },
+      },
+      {
+        name: "create_actor_template",
+        description: "Save an actor as a reusable template",
+        inputSchema: {
+          type: "object",
+          properties: {
+            actorPath: {
+              type: "string",
+              description: "Path to the actor to save as template (requires Adastrea-Director for live actors)",
+            },
+            templateName: {
+              type: "string",
+              description: "Name for the template",
+            },
+            description: {
+              type: "string",
+              description: "Optional description of the template",
+            },
+            category: {
+              type: "string",
+              description: "Optional category for organization",
+            },
+            tags: {
+              type: "array",
+              items: { type: "string" },
+              description: "Optional tags for the template",
+            },
+          },
+          required: ["actorPath", "templateName"],
+        },
+      },
+      {
+        name: "list_actor_templates",
+        description: "List all available actor templates",
+        inputSchema: {
+          type: "object",
+          properties: {
+            category: {
+              type: "string",
+              description: "Optional category filter",
+            },
+            tags: {
+              type: "array",
+              items: { type: "string" },
+              description: "Optional tags filter",
+            },
+          },
+        },
+      },
+      {
+        name: "instantiate_template",
+        description: "Create an actor from a template (requires Adastrea-Director integration)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            templateId: {
+              type: "string",
+              description: "ID of the template to instantiate",
+            },
+            location: {
+              type: "object",
+              description: "World location to spawn the actor",
+              properties: {
+                x: { type: "number" },
+                y: { type: "number" },
+                z: { type: "number" },
+              },
+            },
+            rotation: {
+              type: "object",
+              description: "World rotation for the actor",
+              properties: {
+                pitch: { type: "number" },
+                yaw: { type: "number" },
+                roll: { type: "number" },
+              },
+            },
+            scale: {
+              type: "object",
+              description: "World scale for the actor",
+              properties: {
+                x: { type: "number" },
+                y: { type: "number" },
+                z: { type: "number" },
+              },
+            },
+            name: {
+              type: "string",
+              description: "Optional custom name for the spawned actor",
+            },
+            folder: {
+              type: "string",
+              description: "Level folder to place actor in",
+            },
+          },
+          required: ["templateId"],
+        },
+      },
+      {
+        name: "delete_actor_template",
+        description: "Delete an actor template",
+        inputSchema: {
+          type: "object",
+          properties: {
+            templateId: {
+              type: "string",
+              description: "ID of the template to delete",
+            },
+          },
+          required: ["templateId"],
         },
       },
     ],
@@ -1400,6 +1656,245 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       throw new McpError(
         ErrorCode.InternalError,
         `Failed to modify blueprint property: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  // Actor Management Tools
+  if (name === "spawn_actor") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.className) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "className is required"
+      );
+    }
+
+    try {
+      const result = await unrealManager.spawnActor(args as any);
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.success 
+              ? `✅ ${result.message}\n\n${JSON.stringify(result.actor, null, 2)}` 
+              : `⚠️ ${result.message}${result.error ? `\nError: ${result.error}` : ''}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to spawn actor: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "modify_actor_properties") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.actorPath) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "actorPath is required"
+      );
+    }
+
+    try {
+      const result = await unrealManager.modifyActorProperties(args as any);
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.success 
+              ? `✅ ${result.message}\nModified properties: ${result.modifiedProperties?.join(', ')}` 
+              : `⚠️ ${result.message}${result.error ? `\nError: ${result.error}` : ''}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to modify actor properties: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "get_actor_components") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.actorPath) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "actorPath is required"
+      );
+    }
+
+    try {
+      const hierarchy = await unrealManager.getActorComponents(args.actorPath as string);
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(hierarchy, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to get actor components: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  // Actor Template Management Tools
+  if (name === "create_actor_template") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.actorPath || !args.templateName) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "actorPath and templateName are required"
+      );
+    }
+
+    try {
+      const template = await unrealManager.createTemplateFromActor(args as any);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `✅ Template created successfully:\n\n${JSON.stringify(template, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to create actor template: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "list_actor_templates") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    try {
+      const filter = args ? {
+        category: args.category as string | undefined,
+        tags: args.tags as string[] | undefined,
+      } : undefined;
+      
+      const templates = unrealManager.listTemplates(filter);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Found ${templates.length} template(s):\n\n${JSON.stringify(templates, null, 2)}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to list actor templates: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "instantiate_template") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.templateId) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "templateId is required"
+      );
+    }
+
+    try {
+      const result = await unrealManager.instantiateFromTemplate(args as any);
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.success 
+              ? `✅ ${result.message}\n\n${JSON.stringify(result.actor, null, 2)}` 
+              : `⚠️ ${result.message}${result.error ? `\nError: ${result.error}` : ''}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to instantiate template: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "delete_actor_template") {
+    if (!unrealManager) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        "No Unreal project loaded. Use scan_unreal_project first."
+      );
+    }
+
+    if (!args || !args.templateId) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "templateId is required"
+      );
+    }
+
+    try {
+      const deleted = await unrealManager.deleteTemplate(args.templateId as string);
+      return {
+        content: [
+          {
+            type: "text",
+            text: deleted 
+              ? `✅ Template deleted successfully` 
+              : `⚠️ Template not found`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to delete template: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }

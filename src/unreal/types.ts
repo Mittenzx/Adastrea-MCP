@@ -241,3 +241,155 @@ export interface ProjectSummary {
   };
   platforms: string[];
 }
+
+/**
+ * Actor & Component System Types (Phase 2.3)
+ */
+
+/** Represents a component attached to an actor */
+export interface ActorComponent {
+  name: string;
+  type: string; // Component class name (e.g., 'UStaticMeshComponent', 'UBoxComponent')
+  displayName?: string;
+  attachedTo?: string; // Parent component name
+  isRootComponent?: boolean;
+  properties?: Record<string, any>; // Component property values
+  tags?: string[];
+  metadata?: {
+    relativeLocation?: { x: number; y: number; z: number };
+    relativeRotation?: { pitch: number; yaw: number; roll: number };
+    relativeScale3D?: { x: number; y: number; z: number };
+  };
+}
+
+/** Represents an actor in a level */
+export interface LevelActor {
+  name: string; // Actor instance name in the level
+  path: string; // Full path to the actor (e.g., '/Game/Maps/MainLevel.MainLevel:PersistentLevel.Actor_0')
+  className: string; // Actor class (e.g., 'AStaticMeshActor', 'ABP_Character_C')
+  location?: { x: number; y: number; z: number };
+  rotation?: { pitch: number; yaw: number; roll: number };
+  scale?: { x: number; y: number; z: number };
+  components?: ActorComponent[];
+  properties?: Record<string, any>; // Actor property values
+  tags?: string[];
+  folder?: string; // Level folder path
+  layer?: string; // Level layer
+  isHidden?: boolean;
+  isLocked?: boolean;
+}
+
+/** Configuration for spawning a new actor */
+export interface SpawnActorConfig {
+  className: string; // Class to spawn (e.g., 'AStaticMeshActor', '/Game/Blueprints/BP_Character.BP_Character_C')
+  location?: { x: number; y: number; z: number };
+  rotation?: { pitch: number; yaw: number; roll: number };
+  scale?: { x: number; y: number; z: number };
+  name?: string; // Optional custom name for the actor
+  properties?: Record<string, any>; // Initial property values
+  tags?: string[];
+  folder?: string; // Level folder to place actor in
+  spawnMethod?: 'Deferred' | 'Always'; // Spawn method
+}
+
+/** Result of spawning an actor */
+export interface SpawnActorResult {
+  success: boolean;
+  message: string;
+  actor?: LevelActor;
+  error?: string;
+}
+
+/** Configuration for modifying actor properties */
+export interface ModifyActorPropertiesConfig {
+  actorPath: string; // Full path to the actor
+  properties: Record<string, any>; // Properties to modify
+  transform?: {
+    location?: { x: number; y: number; z: number };
+    rotation?: { pitch: number; yaw: number; roll: number };
+    scale?: { x: number; y: number; z: number };
+  };
+  tags?: string[];
+}
+
+/** Result of modifying actor properties */
+export interface ModifyActorPropertiesResult {
+  success: boolean;
+  message: string;
+  modifiedProperties?: string[];
+  error?: string;
+}
+
+/** Component hierarchy for an actor */
+export interface ComponentHierarchy {
+  rootComponent?: ActorComponent;
+  components: ActorComponent[];
+  hierarchy: Array<{
+    component: ActorComponent;
+    children: ComponentHierarchy['hierarchy'];
+  }>;
+}
+
+/**
+ * Actor Template System Types
+ */
+
+/** Represents a saved actor template/prefab */
+export interface ActorTemplate {
+  id: string; // Unique template ID
+  name: string; // Template name
+  description?: string;
+  className: string; // Base actor class
+  category?: string; // Organization category
+  tags?: string[];
+  // Template data
+  components: ActorComponent[];
+  properties: Record<string, any>;
+  defaultTransform?: {
+    location?: { x: number; y: number; z: number };
+    rotation?: { pitch: number; yaw: number; roll: number };
+    scale?: { x: number; y: number; z: number };
+  };
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+  usageCount?: number; // Track how often this template is used
+  author?: string;
+}
+
+/** Configuration for creating a template from an actor */
+export interface CreateTemplateConfig {
+  actorPath: string; // Path to the actor to save as template
+  templateName: string;
+  description?: string;
+  category?: string;
+  tags?: string[];
+}
+
+/** Configuration for instantiating an actor from a template */
+export interface InstantiateTemplateConfig {
+  templateId: string;
+  location?: { x: number; y: number; z: number };
+  rotation?: { pitch: number; yaw: number; roll: number };
+  scale?: { x: number; y: number; z: number };
+  name?: string; // Optional custom name for the spawned actor
+  folder?: string; // Level folder to place actor in
+}
+
+/** Level/Scene information */
+export interface LevelInfo {
+  name: string;
+  path: string;
+  isPersistent?: boolean;
+  actors: LevelActor[];
+  subLevels?: string[];
+}
+
+/** Response for listing actors in level */
+export interface ListActorsResponse {
+  levelName: string;
+  levelPath: string;
+  actors: LevelActor[];
+  totalCount: number;
+  source: 'director' | 'local'; // Where the data came from
+}

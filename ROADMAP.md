@@ -156,17 +156,24 @@
   - Tool: `modify_blueprint_property` - Change default values
   - Advanced: Node graph manipulation via UE Editor commands
 
-#### 2.3 Actor & Component System
-- [ ] **Level Actor Registry**
+#### 2.3 Actor & Component System ✅ COMPLETED
+- [x] **Level Actor Registry**
   - Resource: `unreal://level/actors` - All actors in current level
   - Tool: `spawn_actor` - Create new actors
   - Tool: `modify_actor_properties` - Change actor properties
-  - Component hierarchy inspection
+  - Tool: `get_actor_components` - Component hierarchy inspection
+  - Tool: `search_actors` - Search actors by class, tag, or name
+  - Tool: `get_actor_details` - Get detailed actor information
 
-- [ ] **Prefab/Actor Template Management**
+- [x] **Prefab/Actor Template Management**
   - Track commonly used actor configurations
-  - Template creation and instantiation
-  - Data-driven actor setup
+  - Template creation and instantiation (Tool: `create_actor_template`)
+  - Data-driven actor setup with templates
+  - Template listing and filtering (Tool: `list_actor_templates`)
+  - Template instantiation (Tool: `instantiate_template`)
+  - Template deletion (Tool: `delete_actor_template`)
+  - Template import/export capabilities
+  - Usage statistics tracking
 
 ---
 
@@ -668,6 +675,7 @@ We welcome contributions from the Unreal Engine and MCP communities:
 |------|---------|---------|
 | 2025-12-16 | 1.0 | Initial roadmap created |
 | 2025-12-18 | 1.1 | Blueprint Interaction Tools completed (Phase 2.2) - Added 7 new tools for Blueprint inspection and modification |
+| 2025-12-19 | 1.2 | Actor & Component System completed (Phase 2.3) - Added 7 new tools for actor management and templates, plus 1 new resource |
 
 **Next Review Date:** 2026-01-15
 
