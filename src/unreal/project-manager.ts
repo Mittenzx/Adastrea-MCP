@@ -9,6 +9,8 @@ import { UnrealAssetAnalyzer } from './asset-analyzer.js';
 import { UnrealPluginScanner } from './plugin-scanner.js';
 import { BlueprintInspector } from './blueprint-inspector.js';
 import { BlueprintModifier } from './blueprint-modifier.js';
+import { ActorManager } from './actor-manager.js';
+import { ActorTemplateManager } from './actor-template-manager.js';
 import {
   UnrealProjectConfig,
   UnrealClass,
@@ -22,6 +24,16 @@ import {
   BlueprintVariable,
   BlueprintFunction as BlueprintFunctionType,
   BlueprintNode,
+  LevelActor,
+  SpawnActorConfig,
+  SpawnActorResult,
+  ModifyActorPropertiesConfig,
+  ModifyActorPropertiesResult,
+  ComponentHierarchy,
+  ListActorsResponse,
+  ActorTemplate,
+  CreateTemplateConfig,
+  InstantiateTemplateConfig,
 } from './types.js';
 
 export class UnrealProjectManager {
@@ -32,6 +44,8 @@ export class UnrealProjectManager {
   private pluginScanner: UnrealPluginScanner;
   private blueprintInspector: BlueprintInspector;
   private blueprintModifier: BlueprintModifier;
+  private actorManager: ActorManager;
+  private actorTemplateManager: ActorTemplateManager;
   
   private config?: UnrealProjectConfig;
   private classes: UnrealClass[] = [];
@@ -47,6 +61,8 @@ export class UnrealProjectManager {
     this.pluginScanner = new UnrealPluginScanner(projectPath);
     this.blueprintInspector = new BlueprintInspector(projectPath);
     this.blueprintModifier = new BlueprintModifier(projectPath);
+    this.actorManager = new ActorManager(projectPath);
+    this.actorTemplateManager = new ActorTemplateManager(projectPath);
   }
 
   /**
@@ -327,5 +343,139 @@ export class UnrealProjectManager {
    */
   setDirectorBridge(bridge: any): void {
     this.blueprintModifier.setDirectorBridge(bridge);
+  }
+
+  // ========================
+  // Actor Management Methods
+  // ========================
+
+  /**
+   * Get all actors in the currently loaded level
+   */
+  async getActorsInLevel(): Promise<ListActorsResponse> {
+    return await this.actorManager.getActorsInLevel();
+  }
+
+  /**
+   * Spawn a new actor in the level
+   */
+  async spawnActor(config: SpawnActorConfig): Promise<SpawnActorResult> {
+    return await this.actorManager.spawnActor(config);
+  }
+
+  /**
+   * Modify properties of an existing actor
+   */
+  async modifyActorProperties(config: ModifyActorPropertiesConfig): Promise<ModifyActorPropertiesResult> {
+    return await this.actorManager.modifyActorProperties(config);
+  }
+
+  /**
+   * Get component hierarchy for an actor
+   */
+  async getActorComponents(actorPath: string): Promise<ComponentHierarchy> {
+    return await this.actorManager.getActorComponents(actorPath);
+  }
+
+  /**
+   * Search for actors by class name, tag, or name pattern
+   */
+  async searchActors(query: string): Promise<LevelActor[]> {
+    return await this.actorManager.searchActors(query);
+  }
+
+  /**
+   * Get detailed information about a specific actor
+   */
+  async getActorDetails(actorPath: string): Promise<LevelActor | null> {
+    return await this.actorManager.getActorDetails(actorPath);
+  }
+
+  // ================================
+  // Actor Template Management Methods
+  // ================================
+
+  /**
+   * Create a new template from an existing actor
+   */
+  async createTemplateFromActor(config: CreateTemplateConfig): Promise<ActorTemplate> {
+    return await this.actorTemplateManager.createTemplateFromActor(config);
+  }
+
+  /**
+   * Create a template manually (for testing or data-driven setup)
+   */
+  async createTemplateManually(template: Omit<ActorTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<ActorTemplate> {
+    return await this.actorTemplateManager.createTemplateManually(template);
+  }
+
+  /**
+   * Get a template by ID
+   */
+  getTemplate(templateId: string): ActorTemplate | undefined {
+    return this.actorTemplateManager.getTemplate(templateId);
+  }
+
+  /**
+   * List all templates
+   */
+  listTemplates(filter?: { category?: string; tags?: string[] }): ActorTemplate[] {
+    return this.actorTemplateManager.listTemplates(filter);
+  }
+
+  /**
+   * Update an existing template
+   */
+  async updateTemplate(templateId: string, updates: Partial<Omit<ActorTemplate, 'id' | 'createdAt'>>): Promise<ActorTemplate> {
+    return await this.actorTemplateManager.updateTemplate(templateId, updates);
+  }
+
+  /**
+   * Delete a template
+   */
+  async deleteTemplate(templateId: string): Promise<boolean> {
+    return await this.actorTemplateManager.deleteTemplate(templateId);
+  }
+
+  /**
+   * Instantiate an actor from a template
+   */
+  async instantiateFromTemplate(config: InstantiateTemplateConfig): Promise<SpawnActorResult> {
+    return await this.actorTemplateManager.instantiateFromTemplate(config);
+  }
+
+  /**
+   * Get template categories
+   */
+  getTemplateCategories(): string[] {
+    return this.actorTemplateManager.getCategories();
+  }
+
+  /**
+   * Get all template tags
+   */
+  getTemplateTags(): string[] {
+    return this.actorTemplateManager.getTags();
+  }
+
+  /**
+   * Get template usage statistics
+   */
+  getTemplateUsageStats() {
+    return this.actorTemplateManager.getUsageStats();
+  }
+
+  /**
+   * Export templates to a JSON file
+   */
+  async exportTemplates(outputPath: string): Promise<void> {
+    return await this.actorTemplateManager.exportTemplates(outputPath);
+  }
+
+  /**
+   * Import templates from a JSON file
+   */
+  async importTemplates(inputPath: string, options?: { overwrite?: boolean }): Promise<number> {
+    return await this.actorTemplateManager.importTemplates(inputPath, options);
   }
 }

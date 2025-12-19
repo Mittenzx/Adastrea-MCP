@@ -11,3 +11,5 @@ export * from './plugin-scanner.js';
 export * from './project-manager.js';
 export * from './blueprint-inspector.js';
 export * from './blueprint-modifier.js';
+export * from './actor-manager.js';
+export * from './actor-template-manager.js';
