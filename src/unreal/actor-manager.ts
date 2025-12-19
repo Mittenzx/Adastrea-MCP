@@ -8,8 +8,6 @@
  * - Inspect component hierarchies
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
 import {
   LevelActor,
   ActorComponent,
@@ -23,9 +21,18 @@ import {
 
 export class ActorManager {
   private projectPath: string;
+  private directorBridge?: any; // Reference to Adastrea-Director bridge
 
-  constructor(projectPath: string) {
+  constructor(projectPath: string, directorBridge?: any) {
     this.projectPath = projectPath;
+    this.directorBridge = directorBridge;
+  }
+
+  /**
+   * Set the Director bridge for live actor operations
+   */
+  setDirectorBridge(bridge: any): void {
+    this.directorBridge = bridge;
   }
 
   /**
@@ -149,8 +156,13 @@ export class ActorManager {
     return null;
   }
 
+  // ========================================
+  // Private helper methods (reserved for future Director integration)
+  // ========================================
+
   /**
    * Build component hierarchy tree from flat component list
+   * Reserved for future use when Director integration is complete.
    */
   private buildComponentHierarchy(
     components: ActorComponent[],
@@ -168,6 +180,7 @@ export class ActorManager {
 
   /**
    * Validate actor class name format
+   * Reserved for future use when Director integration is complete.
    */
   private validateClassName(className: string): boolean {
     // Check if it's a C++ class (starts with A, U, F, etc.)
@@ -180,10 +193,16 @@ export class ActorManager {
 
   /**
    * Format actor path for Unreal Engine
+   * Reserved for future use when Director integration is complete.
    */
   private formatActorPath(levelPath: string, actorName: string): string {
     // Format: /Game/Maps/Level.Level:PersistentLevel.ActorName
-    const levelName = path.basename(levelPath, path.extname(levelPath));
+    // Note: This method uses string operations instead of path.basename/extname
+    // to avoid importing 'path' module for a simple string operation
+    const lastSlash = levelPath.lastIndexOf('/');
+    const levelNameWithExt = lastSlash >= 0 ? levelPath.substring(lastSlash + 1) : levelPath;
+    const lastDot = levelNameWithExt.lastIndexOf('.');
+    const levelName = lastDot >= 0 ? levelNameWithExt.substring(0, lastDot) : levelNameWithExt;
     return `${levelPath}.${levelName}:PersistentLevel.${actorName}`;
   }
 }

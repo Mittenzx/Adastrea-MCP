@@ -14,7 +14,6 @@ import {
   ActorTemplate,
   CreateTemplateConfig,
   InstantiateTemplateConfig,
-  LevelActor,
   SpawnActorResult,
 } from './types.js';
 
@@ -22,13 +21,22 @@ export class ActorTemplateManager {
   private projectPath: string;
   private templatesPath: string;
   private templates: Map<string, ActorTemplate>;
+  private directorBridge?: any; // Reference to Adastrea-Director bridge
 
-  constructor(projectPath: string) {
+  constructor(projectPath: string, directorBridge?: any) {
     this.projectPath = projectPath;
+    this.directorBridge = directorBridge;
     // Store templates in a .adastrea directory in the project root
     this.templatesPath = path.join(projectPath, '.adastrea', 'actor-templates.json');
     this.templates = new Map();
     this.loadTemplates();
+  }
+
+  /**
+   * Set the Director bridge for live template operations
+   */
+  setDirectorBridge(bridge: any): void {
+    this.directorBridge = bridge;
   }
 
   /**
@@ -223,10 +231,10 @@ export class ActorTemplateManager {
     // 3. Set properties from template
     // 4. Apply transform overrides from config
     
-    // Increment usage count
-    template.usageCount = (template.usageCount || 0) + 1;
-    template.updatedAt = new Date().toISOString();
-    this.saveTemplates();
+    // NOTE: Usage count should only be incremented once the actor is successfully
+    // spawned. Since this placeholder implementation always fails, we do not
+    // modify usage statistics here. When Director integration is complete,
+    // increment usage count after successful spawn.
 
     return {
       success: false,
@@ -302,40 +310,80 @@ export class ActorTemplateManager {
    * Generate a unique template ID
    */
   private generateTemplateId(): string {
-    return `template_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `template_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
   }
 
   /**
    * Export templates to a JSON file
    */
   async exportTemplates(outputPath: string): Promise<void> {
-    const templates = Array.from(this.templates.values());
-    fs.writeFileSync(outputPath, JSON.stringify(templates, null, 2), 'utf-8');
+    try {
+      const templates = Array.from(this.templates.values());
+      fs.writeFileSync(outputPath, JSON.stringify(templates, null, 2), 'utf-8');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(`Failed to export templates to "${outputPath}": ${message}`);
+    }
   }
 
   /**
    * Import templates from a JSON file
    */
   async importTemplates(inputPath: string, options?: { overwrite?: boolean }): Promise<number> {
-    const data = fs.readFileSync(inputPath, 'utf-8');
-    const importedTemplates: ActorTemplate[] = JSON.parse(data);
-
-    let imported = 0;
-    for (const template of importedTemplates) {
-      const exists = this.templates.has(template.id);
-      
-      if (exists && !options?.overwrite) {
-        continue; // Skip existing templates unless overwrite is true
+    try {
+      if (!fs.existsSync(inputPath)) {
+        throw new Error(`Template import file not found: ${inputPath}`);
       }
 
-      this.templates.set(template.id, template);
-      imported++;
-    }
+      const data = fs.readFileSync(inputPath, 'utf-8');
 
-    if (imported > 0) {
-      this.saveTemplates();
-    }
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(data);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        throw new Error(`Failed to parse templates JSON from "${inputPath}": ${message}`);
+      }
 
-    return imported;
+      if (!Array.isArray(parsed)) {
+        throw new Error(`Invalid template data in "${inputPath}": expected an array of templates`);
+      }
+
+      const importedTemplates = parsed as ActorTemplate[];
+
+      let imported = 0;
+      for (const template of importedTemplates) {
+        // Validate template structure
+        if (!template || typeof template.id !== 'string') {
+          throw new Error(`Invalid template structure in "${inputPath}": each template must have a string "id" property`);
+        }
+        if (!template.name || typeof template.name !== 'string') {
+          throw new Error(`Invalid template structure in "${inputPath}": each template must have a string "name" property`);
+        }
+        if (!template.className || typeof template.className !== 'string') {
+          throw new Error(`Invalid template structure in "${inputPath}": each template must have a string "className" property`);
+        }
+
+        const exists = this.templates.has(template.id);
+        
+        if (exists && !options?.overwrite) {
+          continue; // Skip existing templates unless overwrite is true
+        }
+
+        this.templates.set(template.id, template);
+        imported++;
+      }
+
+      if (imported > 0) {
+        this.saveTemplates();
+      }
+
+      return imported;
+    } catch (err) {
+      if (err instanceof Error) {
+        throw err;
+      }
+      throw new Error(`Failed to import templates from "${inputPath}": ${String(err)}`);
+    }
   }
 }

@@ -339,10 +339,12 @@ export class UnrealProjectManager {
   }
 
   /**
-   * Set the Director bridge for Blueprint modifications
+   * Set the Director bridge for Blueprint modifications and actor operations
    */
   setDirectorBridge(bridge: any): void {
     this.blueprintModifier.setDirectorBridge(bridge);
+    this.actorManager.setDirectorBridge(bridge);
+    this.actorTemplateManager.setDirectorBridge(bridge);
   }
 
   // ========================

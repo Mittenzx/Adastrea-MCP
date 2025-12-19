@@ -256,7 +256,7 @@ export interface ActorComponent {
   properties?: Record<string, any>; // Component property values
   tags?: string[];
   metadata?: {
-    relativelocation?: { x: number; y: number; z: number };
+    relativeLocation?: { x: number; y: number; z: number };
     relativeRotation?: { pitch: number; yaw: number; roll: number };
     relativeScale3D?: { x: number; y: number; z: number };
   };
