@@ -1,5 +1,25 @@
 #!/usr/bin/env node
 
+/**
+ * Adastrea-MCP Server - Model Context Protocol for Unreal Engine 5.6
+ * 
+ * This MCP server provides comprehensive Unreal Engine 5.6 project management,
+ * analysis, and integration capabilities for AI agents and development tools.
+ * 
+ * Features:
+ * - Game project metadata management
+ * - UE5.6 project structure analysis (.uproject parsing, module detection)
+ * - C++ code analysis (UCLASS, USTRUCT, UENUM, UINTERFACE detection)
+ * - Blueprint inspection and modification
+ * - Asset registry and management
+ * - Live editor integration via Adastrea-Director
+ * - Actor and component system management
+ * - Template-based actor spawning
+ * 
+ * @see https://github.com/Mittenzx/Adastrea-MCP
+ * @see https://github.com/Mittenzx/Adastrea-Director (for live editor integration)
+ */
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -14,13 +34,14 @@ import { GameProjectStorage, GameProject } from "./storage.js";
 import { UnrealProjectManager } from "./unreal/index.js";
 import { EditorBridge } from "./director/index.js";
 
-// Initialize storage
+// Initialize storage for game project metadata
 const storage = new GameProjectStorage();
 
-// Initialize Unreal project manager (will be set if project path is provided)
+// Initialize Unreal project manager (will be set when scan_unreal_project is called)
 let unrealManager: UnrealProjectManager | null = null;
 
 // Initialize Editor Bridge for Adastrea-Director integration
+// This provides live UE5.6 editor communication and falls back to local analysis
 const editorBridge = new EditorBridge({
   enableDirector: true,
   fallbackToLocal: true,
@@ -32,7 +53,7 @@ const editorBridge = new EditorBridge({
   },
 });
 
-// Initialize bridge on startup
+// Initialize bridge on startup (non-blocking)
 editorBridge.initialize().catch((err: unknown) => {
   let errorType = 'Unknown error';
   let errorCode: string | number | undefined;
@@ -61,29 +82,65 @@ editorBridge.initialize().catch((err: unknown) => {
   console.warn('The MCP server will continue to operate using local analysis only.');
 });
 
-// Helper function for deep merging objects
-function deepMerge(target: any, source: any): any {
+/**
+ * Deep merge two objects, with source properties overwriting target properties.
+ * Arrays are replaced entirely rather than merged.
+ * 
+ * @param target - The target object to merge into
+ * @param source - The source object to merge from
+ * @returns A new object with merged properties
+ * 
+ * @example
+ * ```typescript
+ * const target = { a: 1, b: { c: 2 } };
+ * const source = { b: { d: 3 }, e: 4 };
+ * const result = deepMerge(target, source);
+ * // result: { a: 1, b: { c: 2, d: 3 }, e: 4 }
+ * ```
+ */
+function deepMerge<T extends object>(target: T, source: Partial<T>): T {
   const output = { ...target };
   
   for (const key in source) {
-    if (source[key] instanceof Object && key in target && target[key] instanceof Object) {
-      if (Array.isArray(source[key])) {
+    const sourceValue = source[key];
+    const targetValue = target[key];
+    
+    if (sourceValue instanceof Object && targetValue instanceof Object) {
+      if (Array.isArray(sourceValue)) {
         // For arrays, replace entirely
-        output[key] = source[key];
+        output[key] = sourceValue as T[Extract<keyof T, string>];
       } else {
         // For objects, recursively merge
-        output[key] = deepMerge(target[key], source[key]);
+        output[key] = deepMerge(
+          targetValue as object,
+          sourceValue as object
+        ) as T[Extract<keyof T, string>];
       }
     } else {
-      output[key] = source[key];
+      output[key] = sourceValue as T[Extract<keyof T, string>];
     }
   }
   
   return output;
 }
 
-// Validation function for GameProject fields
-function validateGameProject(data: any): void {
+/**
+ * Validates game project data fields to ensure they match expected types.
+ * 
+ * This function performs runtime validation of project data to catch type errors
+ * before they're saved to storage, providing clear error messages for invalid data.
+ * 
+ * @param data - The project data to validate
+ * @throws {Error} If validation fails, with a descriptive error message
+ * 
+ * @remarks
+ * Validates:
+ * - `platform` must be an array
+ * - `team` must be an array with objects containing `name` and `role`
+ * - `features` must be an array
+ * - `timeline` must be an object with optional `milestones` array
+ */
+function validateGameProject(data: Partial<GameProject>): void {
   if (data.platform !== undefined && !Array.isArray(data.platform)) {
     throw new Error("Field 'platform' must be an array");
   }
@@ -92,7 +149,7 @@ function validateGameProject(data: any): void {
     if (!Array.isArray(data.team)) {
       throw new Error("Field 'team' must be an array");
     }
-    data.team.forEach((member: any, index: number) => {
+    data.team.forEach((member, index) => {
       if (!member.name || !member.role) {
         throw new Error(`Team member at index ${index} must have 'name' and 'role' properties`);
       }
@@ -113,7 +170,13 @@ function validateGameProject(data: any): void {
   }
 }
 
-// Create server instance
+/**
+ * Create MCP server instance with Unreal Engine 5.6 capabilities
+ * 
+ * The server exposes:
+ * - Resources: Access to project info, UE5.6 config, assets, Blueprints, actors
+ * - Tools: Project analysis, Blueprint modification, actor spawning, live editor control
+ */
 const server = new Server(
   {
     name: "adastrea-mcp",
@@ -1905,7 +1968,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   );
 });
 
-// Format project summary for human reading
+/**
+ * Formats a GameProject object into a human-readable markdown summary.
+ * 
+ * This function converts structured project data into a formatted text
+ * representation suitable for display in MCP clients or documentation.
+ * 
+ * @param project - The game project data to format
+ * @returns A markdown-formatted string summary of the project
+ * 
+ * @remarks
+ * The output includes:
+ * - Project name as H1 heading
+ * - Description section
+ * - Key metadata (genre, platforms, engine, status, repository)
+ * - Team member list
+ * - Features list
+ * - Timeline with milestones
+ */
 function formatProjectSummary(project: GameProject): string {
   const lines: string[] = [];
   
@@ -1944,7 +2024,7 @@ function formatProjectSummary(project: GameProject): string {
   
   if (project.team && project.team.length > 0) {
     lines.push(`## Team`);
-    project.team.forEach((member: any) => {
+    project.team.forEach((member) => {
       lines.push(`- ${member.name} - ${member.role}`);
     });
     lines.push("");
@@ -1969,7 +2049,7 @@ function formatProjectSummary(project: GameProject): string {
     if (project.timeline.milestones && project.timeline.milestones.length > 0) {
       lines.push("");
       lines.push("**Milestones:**");
-      project.timeline.milestones.forEach((milestone: any) => {
+      project.timeline.milestones.forEach((milestone) => {
         lines.push(`- ${milestone.name} (${milestone.date}) - ${milestone.status}`);
       });
     }
