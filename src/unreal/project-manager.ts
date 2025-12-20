@@ -11,6 +11,7 @@ import { BlueprintInspector } from './blueprint-inspector.js';
 import { BlueprintModifier } from './blueprint-modifier.js';
 import { ActorManager } from './actor-manager.js';
 import { ActorTemplateManager } from './actor-template-manager.js';
+import type { EditorBridgeType } from '../director/bridge.js';
 import {
   UnrealProjectConfig,
   UnrealClass,
@@ -327,7 +328,7 @@ export class UnrealProjectManager {
   /**
    * Modify a Blueprint property (variable default value)
    */
-  async modifyBlueprintProperty(blueprintPath: string, propertyName: string, newValue: any) {
+  async modifyBlueprintProperty(blueprintPath: string, propertyName: string, newValue: unknown) {
     return await this.blueprintModifier.modifyBlueprintProperty(blueprintPath, propertyName, newValue);
   }
 
@@ -341,7 +342,7 @@ export class UnrealProjectManager {
   /**
    * Set the Director bridge for Blueprint modifications and actor operations
    */
-  setDirectorBridge(bridge: any): void {
+  setDirectorBridge(bridge: EditorBridgeType): void {
     this.blueprintModifier.setDirectorBridge(bridge);
     this.actorManager.setDirectorBridge(bridge);
     this.actorTemplateManager.setDirectorBridge(bridge);

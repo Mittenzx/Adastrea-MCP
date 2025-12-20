@@ -16,14 +16,15 @@ import {
   InstantiateTemplateConfig,
   SpawnActorResult,
 } from './types.js';
+import type { EditorBridgeType } from '../director/bridge.js';
 
 export class ActorTemplateManager {
   private projectPath: string;
   private templatesPath: string;
   private templates: Map<string, ActorTemplate>;
-  private directorBridge?: any; // Reference to Adastrea-Director bridge
+  private directorBridge?: EditorBridgeType;
 
-  constructor(projectPath: string, directorBridge?: any) {
+  constructor(projectPath: string, directorBridge?: EditorBridgeType) {
     this.projectPath = projectPath;
     this.directorBridge = directorBridge;
     // Store templates in a .adastrea directory in the project root
@@ -35,7 +36,7 @@ export class ActorTemplateManager {
   /**
    * Set the Director bridge for live template operations
    */
-  setDirectorBridge(bridge: any): void {
+  setDirectorBridge(bridge: EditorBridgeType): void {
     this.directorBridge = bridge;
   }
 

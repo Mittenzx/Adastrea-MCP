@@ -93,7 +93,7 @@ export interface BlueprintVariable {
   name: string;
   type: string;
   category?: string;
-  defaultValue?: any;
+  defaultValue?: unknown;
   isExposed?: boolean; // Exposed to cinematics/blueprints
   isEditable?: boolean; // Editable on instance
   tooltip?: string;
@@ -106,7 +106,7 @@ export interface BlueprintFunctionParameter {
   type: string;
   isReference?: boolean;
   isConst?: boolean;
-  defaultValue?: any;
+  defaultValue?: unknown;
 }
 
 export interface BlueprintFunction {
@@ -139,7 +139,7 @@ export interface BlueprintPin {
   type: string;
   direction: 'Input' | 'Output';
   isExecution?: boolean; // Execution pin vs data pin
-  defaultValue?: any;
+  defaultValue?: unknown;
   connections?: string[]; // IDs of connected pins
 }
 

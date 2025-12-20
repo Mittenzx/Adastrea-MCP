@@ -14,6 +14,15 @@ import { UnrealProjectManager } from '../unreal/index.js';
 import { UnrealProjectConfig, AssetInfo } from '../unreal/types.js';
 
 /**
+ * Type alias for EditorBridge to avoid circular dependency issues
+ */
+export type EditorBridgeType = {
+  executeConsoleCommand(command: string): Promise<unknown>;
+  executePythonScript(code: string): Promise<unknown>;
+  isDirectorAvailable(): boolean;
+};
+
+/**
  * Configuration for the Editor Bridge
  */
 export interface BridgeConfig {

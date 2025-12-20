@@ -60,7 +60,7 @@ export interface EditorState {
      * - editingMode: string (e.g., "Landscape", "Foliage", "Modeling")
      * - viewportName: string (e.g., "Top", "Front", "Perspective")
      */
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
   };
   
   /** Editor viewport state */
@@ -77,7 +77,7 @@ export interface EditorState {
 export interface DirectorTool {
   name: string;
   description: string;
-  inputSchema: Record<string, any>;
+  inputSchema: Record<string, unknown>;
 }
 
 /**
@@ -93,7 +93,7 @@ export interface DirectorResource {
 /**
  * Response from Director MCP server
  */
-export interface DirectorResponse<T = any> {
+export interface DirectorResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

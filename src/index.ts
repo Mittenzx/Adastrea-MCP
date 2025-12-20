@@ -59,11 +59,11 @@ editorBridge.initialize().catch((err: unknown) => {
   let errorCode: string | number | undefined;
 
   if (err && typeof err === 'object') {
-    const anyErr = err as { name?: string; code?: string | number };
+    const anyErr = err as { name?: string; code?: string | number; constructor?: { name?: string } };
     if (anyErr.name) {
       errorType = anyErr.name;
-    } else if ((anyErr as any).constructor && (anyErr as any).constructor.name) {
-      errorType = (anyErr as any).constructor.name;
+    } else if (anyErr.constructor?.name) {
+      errorType = anyErr.constructor.name;
     }
     errorCode = anyErr.code;
   }
@@ -91,12 +91,10 @@ editorBridge.initialize().catch((err: unknown) => {
  * @returns A new object with merged properties
  * 
  * @example
- * ```typescript
  * const target = { a: 1, b: { c: 2 } };
  * const source = { b: { d: 3 }, e: 4 };
  * const result = deepMerge(target, source);
  * // result: { a: 1, b: { c: 2, d: 3 }, e: 4 }
- * ```
  */
 function deepMerge<T extends object>(target: T, source: Partial<T>): T {
   const output = { ...target };
