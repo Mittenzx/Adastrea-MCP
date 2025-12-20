@@ -730,7 +730,13 @@ We welcome contributions from the Unreal Engine and MCP communities:
 | 2025-12-16 | 1.0 | Initial roadmap created |
 | 2025-12-18 | 1.1 | Blueprint Interaction Tools completed (Phase 2.2) - Added 7 new tools for Blueprint inspection and modification |
 | 2025-12-19 | 1.2 | Actor & Component System completed (Phase 2.3) - Added 7 new tools for actor management and templates, plus 1 new resource |
-| 2025-12-20 | 1.3 | Updated with Adastrea repository knowledge - Added GitHub API access, Adastrea-Director status (production external tool, plugin conversion Q1-Q3 2026), Adastrea project status (code 85% complete, content 10% complete, 22+ systems, 33,000+ C++ lines), comprehensive documentation references |
+| 2025-12-20 | 1.3 | Adastrea repository integration and documentation updates |
+
+**Details for v1.3 (2025-12-20)**
+- Added GitHub API access to leverage Adastrea repository knowledge
+- Documented Adastrea-Director status (production external tool; plugin conversion planned Q1-Q3 2026)
+- Updated Adastrea project status (code 85% complete; content 10% complete; 22+ systems; 33,000+ C++ lines)
+- Linked comprehensive documentation references for systems and guides
 
 **Next Review Date:** 2026-01-15
 
