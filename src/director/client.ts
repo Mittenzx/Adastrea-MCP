@@ -248,7 +248,7 @@ export class DirectorClient {
     endpoint: string,
     options?: {
       method?: string;
-      body?: any;
+      body?: Record<string, unknown>;
     }
   ): Promise<DirectorResponse<T>> {
     // TODO: Implement actual HTTP client when Director REST API is available

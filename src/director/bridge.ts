@@ -9,8 +9,9 @@
  */
 
 import { DirectorClient } from './client.js';
-import { DirectorConfig, EditorState } from './types.js';
+import { DirectorConfig, DirectorProjectInfo, DirectorAssetInfo, EditorState } from './types.js';
 import { UnrealProjectManager } from '../unreal/index.js';
+import { UnrealProjectConfig, AssetInfo } from '../unreal/types.js';
 
 /**
  * Configuration for the Editor Bridge
@@ -109,7 +110,7 @@ export class EditorBridge {
    * so callers can distinguish between Director results, local results, and errors.
    */
   async getProjectInfo(): Promise<{
-    projectInfo: any;
+    projectInfo: DirectorProjectInfo | UnrealProjectConfig | null;
     source: 'director' | 'local' | 'none';
     directorAvailable: boolean;
     localAnalysisAvailable: boolean;
@@ -135,7 +136,7 @@ export class EditorBridge {
 
         // If Director fails but local analysis is available, fall back to local
         if (localAnalysisAvailable) {
-          const localInfo = this.unrealManager!.getProjectConfig();
+          const localInfo = this.unrealManager!.getProjectConfig() || null;
           return {
             projectInfo: localInfo,
             source: 'local',
@@ -158,7 +159,7 @@ export class EditorBridge {
 
     // Fall back to local analysis if enabled and available
     if (localAnalysisAvailable) {
-      const localInfo = this.unrealManager!.getProjectConfig();
+      const localInfo = this.unrealManager!.getProjectConfig() || null;
       return {
         projectInfo: localInfo,
         source: 'local',
@@ -180,7 +181,7 @@ export class EditorBridge {
   /**
    * List assets - prefers Director (live) over local (cached)
    */
-  async listAssets(filter?: string): Promise<any[]> {
+  async listAssets(filter?: string): Promise<Array<DirectorAssetInfo | AssetInfo>> {
     // Try Director first for live asset list
     if (this.directorClient?.isConnected()) {
       try {

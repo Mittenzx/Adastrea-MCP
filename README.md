@@ -257,7 +257,7 @@ Get live project information from the running UE Editor. Prefers live data from 
   "projectInfo": {
     "projectName": "MyGame",
     "projectPath": "C:/Projects/MyGame",
-    "engineVersion": "5.3",
+    "engineVersion": "5.6",
     "isLoaded": true
   },
   "source": "director",
