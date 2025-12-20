@@ -5,6 +5,8 @@
 
 **Mission:** Create an intelligent bridge between AI development tools and Unreal Engine that accelerates game development, improves code quality, and makes professional game development accessible to teams of all sizes.
 
+> **🔗 Adastrea Repository Access:** This MCP server has full access to the [Adastrea repository](https://github.com/Mittenzx/Adastrea) (UE 5.6 space flight game) for comprehensive project understanding and context-aware assistance.
+
 ---
 
 ## Current State (v1.0.0)
@@ -22,14 +24,17 @@
 - Store and retrieve game project information
 - Track development milestones and team members
 - Provide AI agents with project context
+- Full GitHub API access to Adastrea repository
+- Comprehensive knowledge of 22+ Adastrea game systems
+- Understanding of Unreal Engine 5.6 project structure
 
 ### ⚠️ Current Limitations
-- No direct Unreal Engine integration
-- No access to C++ code structure or Blueprints
-- No asset management capabilities
-- No real-time project inspection
-- Limited to manual metadata updates
-- No understanding of Unreal-specific systems
+- No direct Unreal Engine integration (Adastrea-Director provides this)
+- Limited to metadata updates (no live code analysis yet)
+- No understanding of Unreal-specific systems (Phase 1 addresses this)
+- No real-time project inspection (Phase 2 addresses this via Adastrea-Director)
+
+> **Note:** Adastrea-MCP focuses on static analysis and project metadata. For live Unreal Engine editor integration, see [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director).
 
 ---
 
@@ -123,6 +128,13 @@
 **Goal:** Enable direct interaction with Unreal Engine Editor and runtime
 
 > 🔗 **Implementation Note:** Phase 2 integration leverages the existing [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) Unreal Engine plugin, which already provides C++ editor integration, Python backend with IPC communication, and MCP server capabilities. The focus is on integrating Adastrea-MCP with Adastrea-Director's infrastructure.
+>
+> 📋 **Adastrea-Director Status:** Currently a production-ready external Python tool with:
+> - ✅ Phase 1: RAG-based documentation Q&A (100% test coverage)
+> - ✅ Phase 2: Planning system with LLM integration (Google Gemini)
+> - ⏳ Phase 3: Autonomous agents (performance, bug detection, code quality) - Planned
+> - 🎯 **Plugin Conversion:** Planned for Q1-Q3 2026 as native UE plugin (16-20 weeks, $92.5-113k budget)
+> - 📊 **ROI:** 222-230% in 6 months for external tool; plugin adds seamless integration and autonomous agents
 
 #### 2.1 Editor Communication Layer ✅ COMPLETED
 - [x] **Unreal Engine Editor Plugin Integration**
@@ -329,11 +341,26 @@ Adastrea-MCP Server (Node.js/TypeScript)
     │   └── Bridge to Adastrea-Director
     │       ↓
     │   Adastrea-Director (github.com/Mittenzx/Adastrea-Director)
-    │       ├── UE C++ Plugin (Editor integration)
-    │       ├── Python Backend (IPC communication)
-    │       ├── MCP Server (remote execution, asset mgmt)
-    │       ├── RAG System (document understanding)
-    │       └── Planning Agents (task decomposition)
+    │       ├── Current (External Tool):
+    │       │   ├── Python Backend (RAG with ChromaDB)
+    │       │   ├── LangChain + Google Gemini Integration
+    │       │   ├── Planning System (task decomposition)
+    │       │   └── 161 passing tests (100% Phase 1 coverage)
+    │       │
+    │       ├── Future (Native Plugin - Q1-Q3 2026):
+    │       │   ├── UE C++ Plugin (Editor integration)
+    │       │   ├── Python Subprocess (reuses 95% existing code)
+    │       │   ├── Slate UI (docked panel in editor)
+    │       │   ├── IPC via local sockets
+    │       │   ├── MCP Server (remote execution, asset mgmt)
+    │       │   ├── RAG System (document understanding)
+    │       │   └── Autonomous Agents (performance, bug detection, quality)
+    │       │
+    │       └── Adastrea Project Context:
+    │           ├── 22+ Game Systems (33,000+ lines C++)
+    │           ├── Status: Code 85% complete, Content 10% complete
+    │           ├── Documentation: 150+ guides (MASTER_DOCUMENTATION.md)
+    │           └── Phase: Phase 4 (Gameplay & Polish) in progress
     │
     ├── Code Analysis Engine
     │   ├── C++ Parser (clangd)
@@ -353,18 +380,38 @@ Adastrea-MCP Server (Node.js/TypeScript)
 
 **Adastrea-MCP** focuses on:
 - Static analysis (code structure, dependencies, patterns)
-- Project metadata and documentation
+- Project metadata and documentation (via GitHub API for Adastrea repo)
 - Build configuration and planning
 - Cross-project capabilities
+- MCP protocol standardization
 
 **Adastrea-Director** provides:
-- Live Unreal Engine editor integration
-- Real-time asset and actor manipulation
-- Python code execution in UE
-- RAG-based documentation assistance
-- Autonomous planning and task decomposition
+- **Current (External Tool):**
+  - RAG-based documentation search (ChromaDB)
+  - LLM integration (Google Gemini)
+  - Task planning and decomposition
+  - Code generation with multiple approaches
+  - 100% test coverage for Phase 1-2
+- **Future (Native Plugin - Q1-Q3 2026):**
+  - Live Unreal Engine editor integration
+  - Real-time asset and actor manipulation
+  - Python code execution in UE
+  - Slate UI docked panel
+  - Autonomous monitoring agents
 
-Together, they form a complete development ecosystem where Adastrea-MCP provides the "brain" (understanding, planning, analysis) and Adastrea-Director provides the "hands" (execution, manipulation, real-time interaction).
+**Adastrea Project** (Space Flight Game):
+- **Status:** Alpha 1.0.0-alpha, Phase 4 (Gameplay & Polish)
+- **Progress:** Code 85% complete, Content 10% complete
+- **Systems:** 22+ major game systems (Spaceship, Faction, Trading, AI, etc.)
+- **C++ Code:** 33,000+ lines with Blueprint integration
+- **Documentation:** 150+ guides consolidated in MASTER_DOCUMENTATION.md
+- **Reality:** C++ systems implemented, editor content (Blueprints, Data Assets, Maps, UI) needs creation
+- **Tools:** Comprehensive Python automation (ScenePopulator, ProceduralGenerators, etc.)
+
+Together, they form a complete development ecosystem where:
+- **Adastrea-MCP** provides the "knowledge" (understanding, metadata, analysis)
+- **Adastrea-Director** provides the "hands" (execution, manipulation, real-time interaction)
+- **Adastrea Project** provides the "context" (real-world UE5 project for testing and validation)
 
 ---
 
@@ -599,8 +646,11 @@ Together, they form a complete development ecosystem where Adastrea-MCP provides
 ## Resource Requirements
 
 ### Development Team (Estimated)
-- **Phase 1:** 1-2 developers, 3 months
+- **Phase 1:** 1-2 developers, 3 months ✅ **COMPLETED**
 - **Phase 2:** 2-3 developers, 2-4 weeks (leverages existing Adastrea-Director plugin for UE integration)
+  - Note: Adastrea-Director plugin conversion timeline: 16-20 weeks (Q1-Q3 2026)
+  - Budget: $92.5-113k for full native plugin
+  - Current: Production-ready external Python tool (Phase 1-2 complete)
 - **Phase 3:** 2-3 developers, 3 months
 - **Phase 4:** 3-4 developers, 3 months
 - **Phase 5:** 2-3 developers with AI/ML expertise, 3 months
@@ -608,10 +658,12 @@ Together, they form a complete development ecosystem where Adastrea-MCP provides
 ### Technology Stack
 - **Core Server:** Node.js, TypeScript, MCP SDK
 - **Code Analysis:** clangd, tree-sitter, TypeScript compiler API
-- **UE Integration:** [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) (C++ plugin + Python backend + MCP server)
+- **UE Integration:** [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director)
+  - **Current:** Python backend (Flask/FastAPI), ChromaDB (RAG), LangChain, Google Gemini
+  - **Future:** C++ UE plugin + Python subprocess (95% code reuse), Slate UI, IPC (local sockets)
 - **Storage:** SQLite (indexing), LevelDB (caching), JSON (metadata)
 - **Communication:** WebSocket, HTTP/REST, IPC (via Adastrea-Director)
-- **AI/ML:** Semantic search models, pattern recognition
+- **AI/ML:** Semantic search models, pattern recognition, Google Gemini LLM
 
 ### Infrastructure
 - **Development:** Standard development machines with UE5
@@ -626,11 +678,12 @@ Together, they form a complete development ecosystem where Adastrea-MCP provides
 ### Immediate Next Steps (Week 1-2)
 1. ✅ **This Roadmap Document** - Define the vision
 2. ✅ **Adastrea-Director Integration** - Reference existing UE plugin infrastructure
-3. **Explore Integration Points** - Analyze how to bridge Adastrea-MCP with Adastrea-Director
-4. **Community Feedback** - Share with UE developers, gather input
-5. **Technology Validation** - Prototype .uproject parsing
-6. **Architecture Planning** - Detailed design for Phase 1 + Phase 2 integration
-7. **Setup Development Environment** - Prepare UE5 test projects
+3. ✅ **Adastrea Repository Access** - Full GitHub API access for comprehensive project understanding
+4. **Explore Integration Points** - Analyze how to bridge Adastrea-MCP with Adastrea-Director
+5. **Community Feedback** - Share with UE developers, gather input
+6. **Technology Validation** - Prototype .uproject parsing
+7. **Architecture Planning** - Detailed design for Phase 1 + Phase 2 integration
+8. **Setup Development Environment** - Prepare UE5 test projects
 
 ### Phase 1 Kickoff (Month 1)
 1. **Project Structure Parser** - Implement .uproject parsing
@@ -660,12 +713,13 @@ We welcome contributions from the Unreal Engine and MCP communities:
 
 ### Our Competitive Advantages
 1. **Unreal-Native:** Built specifically for UE, not generic
-2. **Deep Integration:** Editor plugin for live interaction
+2. **Deep Integration:** Editor plugin for live interaction (via Adastrea-Director)
 3. **Blueprint Support:** Full Blueprint and C++ coverage
 4. **Open Source:** Community-driven, extensible
 5. **AI-First:** Designed for AI agent interaction from day one
 6. **Comprehensive:** Covers entire development lifecycle
 7. **Production-Ready:** Built by game developers for game developers
+8. **Real-World Tested:** Validated with Adastrea (UE 5.6 space flight game with 22+ systems, 33,000+ lines C++, 150+ documentation guides)
 
 ---
 
@@ -676,11 +730,22 @@ We welcome contributions from the Unreal Engine and MCP communities:
 | 2025-12-16 | 1.0 | Initial roadmap created |
 | 2025-12-18 | 1.1 | Blueprint Interaction Tools completed (Phase 2.2) - Added 7 new tools for Blueprint inspection and modification |
 | 2025-12-19 | 1.2 | Actor & Component System completed (Phase 2.3) - Added 7 new tools for actor management and templates, plus 1 new resource |
+| 2025-12-20 | 1.3 | Adastrea repository integration and documentation updates |
+
+**Details for v1.3 (2025-12-20)**
+- Added GitHub API access to leverage Adastrea repository knowledge
+- Documented Adastrea-Director status (production external tool; plugin conversion planned Q1-Q3 2026)
+- Updated Adastrea project status (code 85% complete; content 10% complete; 22+ systems; 33,000+ C++ lines)
+- Linked comprehensive documentation references for systems and guides
 
 **Next Review Date:** 2026-01-15
 
 **Maintained by:** Adastrea-MCP Development Team
 **Contact:** https://github.com/Mittenzx/Adastrea-MCP
+
+**Related Resources:**
+- [Adastrea Game Repository](https://github.com/Mittenzx/Adastrea) - UE 5.6 space flight game
+- [Adastrea-Director Repository](https://github.com/Mittenzx/Adastrea-Director) - AI development assistant tool
 
 ---
 
