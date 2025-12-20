@@ -11,18 +11,23 @@ import {
   BlueprintVariable,
   BlueprintFunction,
 } from './types.js';
+import type { EditorBridgeType } from '../director/bridge.js';
 
 export interface BlueprintModificationResult {
   success: boolean;
   message: string;
-  details?: any;
+  details?: {
+    requiresDirector?: boolean;
+    validationErrors?: string[];
+    [key: string]: unknown;
+  };
 }
 
 export class BlueprintModifier {
   private projectPath: string;
-  private directorBridge?: any; // Reference to Adastrea-Director bridge
+  private directorBridge?: EditorBridgeType;
 
-  constructor(projectPath: string, directorBridge?: any) {
+  constructor(projectPath: string, directorBridge?: EditorBridgeType) {
     this.projectPath = projectPath;
     this.directorBridge = directorBridge;
   }
@@ -132,7 +137,7 @@ export class BlueprintModifier {
   async modifyBlueprintProperty(
     blueprintPath: string,
     propertyName: string,
-    newValue: any
+    newValue: unknown
   ): Promise<BlueprintModificationResult> {
     if (!propertyName || propertyName.trim() === '') {
       return {
@@ -285,7 +290,7 @@ export class BlueprintModifier {
   /**
    * Set the Director bridge for Blueprint modifications
    */
-  setDirectorBridge(bridge: any): void {
+  setDirectorBridge(bridge: EditorBridgeType): void {
     this.directorBridge = bridge;
   }
 }

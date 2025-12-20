@@ -192,7 +192,7 @@ Get live project information from the running Unreal Engine Editor. Prefers live
 {
   "projectName": "MyGame",
   "projectPath": "C:/Projects/MyGame",
-  "engineVersion": "5.3",
+  "engineVersion": "5.6",
   "isLoaded": true
 }
 ```

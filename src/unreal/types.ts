@@ -1,7 +1,20 @@
 /**
- * Type definitions for Unreal Engine project structures
+ * Type definitions for Unreal Engine 5.6 project structures
+ * 
+ * These types represent the structures used in Unreal Engine 5.6,
+ * including .uproject files, Blueprints, assets, and actor systems.
+ * 
+ * UE5.6 introduces enhanced Blueprint tooling, improved asset management,
+ * and new actor component system features that are reflected in these types.
  */
 
+/**
+ * UE5.6 .uproject file structure
+ * 
+ * Represents the structure of an Unreal Engine 5.6 project file (.uproject).
+ * This is the primary configuration file that defines engine association,
+ * modules, plugins, and project metadata.
+ */
 export interface UProjectFile {
   FileVersion: number;
   EngineAssociation: string;
@@ -70,12 +83,17 @@ export interface BlueprintAsset {
   functions?: string[];
 }
 
-// Detailed Blueprint structures for inspection and modification
+/**
+ * Blueprint variable definition for UE5.6
+ * 
+ * UE5.6 supports enhanced variable properties including improved
+ * replication options and editor visibility controls.
+ */
 export interface BlueprintVariable {
   name: string;
   type: string;
   category?: string;
-  defaultValue?: any;
+  defaultValue?: unknown;
   isExposed?: boolean; // Exposed to cinematics/blueprints
   isEditable?: boolean; // Editable on instance
   tooltip?: string;
@@ -88,7 +106,7 @@ export interface BlueprintFunctionParameter {
   type: string;
   isReference?: boolean;
   isConst?: boolean;
-  defaultValue?: any;
+  defaultValue?: unknown;
 }
 
 export interface BlueprintFunction {
@@ -121,7 +139,7 @@ export interface BlueprintPin {
   type: string;
   direction: 'Input' | 'Output';
   isExecution?: boolean; // Execution pin vs data pin
-  defaultValue?: any;
+  defaultValue?: unknown;
   connections?: string[]; // IDs of connected pins
 }
 
@@ -199,7 +217,9 @@ export interface BuildConfiguration {
 export interface UnrealProjectConfig {
   projectPath: string;
   projectName: string;
-  engineVersion: string; // Engine version / association, mirroring Unreal's "EngineAssociation" (e.g., "5.3", "5.2", a GUID like "{00000000-0000-0000-0000-000000000000}", or a custom name)
+  engineVersion: string; // Engine version or association from .uproject file
+                         // For UE5.6: typically "5.6" or a GUID like "{00000000-0000-0000-0000-000000000000}"
+                         // Can also be a custom engine name for source builds
   modules: ModuleInfo[];
   plugins: PluginInfo[];
   targetPlatforms: string[];

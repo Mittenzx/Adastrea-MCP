@@ -114,7 +114,7 @@ The following REST endpoints need to be implemented in Adastrea-Director:
   {
     "projectName": "MyGame",
     "projectPath": "C:/Projects/MyGame",
-    "engineVersion": "5.3",
+    "engineVersion": "5.6",
     "isLoaded": true
   }
   ```

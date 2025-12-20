@@ -18,12 +18,13 @@ import {
   ComponentHierarchy,
   ListActorsResponse,
 } from './types.js';
+import type { EditorBridgeType } from '../director/bridge.js';
 
 export class ActorManager {
   private projectPath: string;
-  private directorBridge?: any; // Reference to Adastrea-Director bridge
+  private directorBridge?: EditorBridgeType;
 
-  constructor(projectPath: string, directorBridge?: any) {
+  constructor(projectPath: string, directorBridge?: EditorBridgeType) {
     this.projectPath = projectPath;
     this.directorBridge = directorBridge;
   }
@@ -31,7 +32,7 @@ export class ActorManager {
   /**
    * Set the Director bridge for live actor operations
    */
-  setDirectorBridge(bridge: any): void {
+  setDirectorBridge(bridge: EditorBridgeType): void {
     this.directorBridge = bridge;
   }
 
