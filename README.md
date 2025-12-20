@@ -10,14 +10,17 @@ This MCP server is specifically designed for the Adastrea game project, providin
 
 **Game Repository:** https://github.com/Mittenzx/Adastrea
 
+**🔗 Repository Access:** This MCP server has full GitHub API access to the Adastrea repository for comprehensive project understanding.
+
 **Pre-populated Project Data:** The MCP server comes with comprehensive information about the Adastrea project already loaded, including:
 - Complete game description and features (22 major systems)
 - Technical details (33,000+ lines of C++ code)
 - Development timeline and milestones
 - Python automation tools and YAML templates
-- Current project status (Alpha phase, code 85% complete)
+- Current project status (Alpha 1.0.0-alpha, Phase 4 in progress)
+- Reality check: Code 85% complete, Content 10% complete
 
-The pre-populated data ensures AI agents have immediate context about Adastrea without manual configuration.
+The pre-populated data combined with live repository access ensures AI agents have immediate and up-to-date context about Adastrea without manual configuration.
 
 ## Features
 
