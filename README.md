@@ -66,6 +66,25 @@ The pre-populated data combined with live repository access ensures AI agents ha
 - **Actor Templates**: Save and reuse common actor configurations
 - **Template Management**: Create, list, instantiate, and manage actor templates
 
+### UE5.6+ Knowledge Database (✅ Completed)
+- **Comprehensive Systems Library**: Detailed information on 12+ core Unreal Engine 5.6+ systems including:
+  - Core Architecture (modules, subsystems, asset management)
+  - Gameplay Framework (actors, components, game modes)
+  - Rendering System (Lumen, Nanite, Virtual Shadow Maps)
+  - Animation System (UAF, Motion Trails, MetaHuman)
+  - Physics System (Chaos, collision, vehicles)
+  - AI System (Behavior Trees, State Trees, Mass Entity)
+  - Networking System (Iris replication, RPCs)
+  - Audio System (MetaSounds, procedural audio)
+  - UI System (UMG, Common UI, MVVM)
+  - Niagara VFX System (particles, fluids)
+  - Gameplay Ability System (GAS)
+  - Material System (PBR, node-based editor)
+- **Rich Metadata**: Each system includes features, best practices, version info, related systems, and official references
+- **Searchable Knowledge**: Query by keywords, tags, or system IDs
+- **Web-Sourced Information**: Curated from official documentation, community forums, tutorials, and expert resources
+- **MCP Resources & Tools**: Access via resources (`unreal://knowledge/*`) and query tools
+
 ## Installation
 
 ```bash
@@ -111,6 +130,11 @@ Add this to your MCP client configuration (e.g., Claude Desktop, Cline, or other
 
 #### Actor & Component Resources (Phase 2.3)
 - `unreal://level/actors` - All actors in the current level with component hierarchies
+
+#### UE5.6+ Knowledge Database Resources
+- `unreal://knowledge/summary` - Overview of the UE5.6+ knowledge database with system counts and categories
+- `unreal://knowledge/systems` - Complete catalog of all UE5.6+ systems with detailed information, features, best practices, and references
+- `unreal://knowledge/tags` - All available tags for categorizing and searching UE5.6+ systems
 
 ### Available Tools
 
@@ -416,6 +440,64 @@ Delete an actor template.
 }
 ```
 
+### UE5.6+ Knowledge Database Tools
+
+#### query_ue_knowledge
+
+Search the UE5.6+ knowledge database for information about Unreal Engine systems, features, and best practices.
+
+**Parameters:**
+- `query` (string, required): Search query (keywords, system names, or tags)
+
+**Example:**
+```json
+{
+  "query": "rendering"
+}
+```
+
+#### get_ue_system
+
+Get detailed information about a specific Unreal Engine system by ID.
+
+**Parameters:**
+- `systemId` (string, required): System ID (e.g., 'rendering-system', 'gameplay-framework', 'animation-system')
+
+**Example:**
+```json
+{
+  "systemId": "rendering-system"
+}
+```
+
+#### get_ue_systems_by_tag
+
+Get all Unreal Engine systems that match a specific tag.
+
+**Parameters:**
+- `tag` (string, required): Tag to filter by (e.g., 'rendering', 'gameplay', 'animation', 'networking')
+
+**Example:**
+```json
+{
+  "tag": "gameplay"
+}
+```
+
+#### get_related_ue_systems
+
+Get systems related to a specific Unreal Engine system.
+
+**Parameters:**
+- `systemId` (string, required): System ID to find related systems for
+
+**Example:**
+```json
+{
+  "systemId": "gameplay-ability-system"
+}
+```
+
 ## Example Workflows
 
 ### Basic Project Information
@@ -566,6 +648,44 @@ Delete an actor template.
    Use instantiate_template with:
    - templateId: "template_1234567890_abc123xyz"
    - location: {x: 500, y: 300, z: 0}
+   ```
+
+### UE5.6+ Knowledge Database
+
+1. **Explore Available Systems:**
+   ```
+   Read unreal://knowledge/summary to get:
+   - Total number of systems
+   - Systems by version
+   - All available tags
+   ```
+
+2. **Search for Specific Information:**
+   ```
+   Use query_ue_knowledge with:
+   - query: "rendering"
+   Returns all systems related to rendering (Lumen, Nanite, VSM)
+   ```
+
+3. **Get Detailed System Info:**
+   ```
+   Use get_ue_system with:
+   - systemId: "gameplay-ability-system"
+   Returns complete details including features, best practices, and references
+   ```
+
+4. **Find Systems by Category:**
+   ```
+   Use get_ue_systems_by_tag with:
+   - tag: "networking"
+   Returns all networking-related systems
+   ```
+
+5. **Discover Related Systems:**
+   ```
+   Use get_related_ue_systems with:
+   - systemId: "animation-system"
+   Returns related systems like gameplay-framework and metahuman-system
    ```
 
 ## Data Storage
