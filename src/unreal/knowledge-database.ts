@@ -151,7 +151,7 @@ export const UnrealEngineKnowledge: Record<string, SystemCategory> = {
       },
       {
         name: 'Nanite',
-        description: 'Virtualized, instance-driven geometry solution enabling film-quality meshes at scale. Processes millions of triangles efficiently by streaming only what\'s visible',
+        description: "Virtualized, instance-driven geometry solution enabling film-quality meshes at scale. Processes millions of triangles efficiently by streaming only what's visible",
         since: '5.0',
         status: 'stable'
       },
