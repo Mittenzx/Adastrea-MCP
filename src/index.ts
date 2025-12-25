@@ -33,6 +33,16 @@ import {
 import { GameProjectStorage, GameProject } from "./storage.js";
 import { UnrealProjectManager } from "./unreal/index.js";
 import { EditorBridge } from "./director/index.js";
+import {
+  UnrealEngineKnowledge,
+  searchKnowledge,
+  getSystem,
+  getSystemsByTag,
+  getAllTags,
+  getRelatedSystems,
+  getKnowledgeSummary,
+  type SystemCategory
+} from "./unreal/knowledge-database.js";
 
 // Initialize storage for game project metadata
 const storage = new GameProjectStorage();
@@ -277,6 +287,28 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
     );
   }
 
+  // Add UE5.6+ Knowledge Database resources
+  resources.push(
+    {
+      uri: "unreal://knowledge/summary",
+      name: "UE5.6+ Knowledge Database Summary",
+      description: "Overview of the Unreal Engine 5.6+ knowledge database with system counts and categories",
+      mimeType: "application/json",
+    },
+    {
+      uri: "unreal://knowledge/systems",
+      name: "UE5.6+ Systems Catalog",
+      description: "Complete catalog of all Unreal Engine 5.6+ systems with detailed information",
+      mimeType: "application/json",
+    },
+    {
+      uri: "unreal://knowledge/tags",
+      name: "UE5.6+ Knowledge Tags",
+      description: "All available tags for categorizing and searching UE5.6+ systems",
+      mimeType: "application/json",
+    }
+  );
+
   return { resources };
 });
 
@@ -440,6 +472,45 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
           uri,
           mimeType: "application/json",
           text: JSON.stringify(capabilities, null, 2),
+        },
+      ],
+    };
+  }
+
+  // UE5.6+ Knowledge Database resources
+  if (uri === "unreal://knowledge/summary") {
+    const summary = getKnowledgeSummary();
+    return {
+      contents: [
+        {
+          uri,
+          mimeType: "application/json",
+          text: JSON.stringify(summary, null, 2),
+        },
+      ],
+    };
+  }
+
+  if (uri === "unreal://knowledge/systems") {
+    return {
+      contents: [
+        {
+          uri,
+          mimeType: "application/json",
+          text: JSON.stringify(UnrealEngineKnowledge, null, 2),
+        },
+      ],
+    };
+  }
+
+  if (uri === "unreal://knowledge/tags") {
+    const tags = getAllTags();
+    return {
+      contents: [
+        {
+          uri,
+          mimeType: "application/json",
+          text: JSON.stringify({ tags }, null, 2),
         },
       ],
     };
@@ -1124,6 +1195,62 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ["templateId"],
+        },
+      },
+      {
+        name: "query_ue_knowledge",
+        description: "Search the UE5.6+ knowledge database for information about Unreal Engine systems, features, and best practices",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query (keywords, system names, or tags)",
+            },
+          },
+          required: ["query"],
+        },
+      },
+      {
+        name: "get_ue_system",
+        description: "Get detailed information about a specific Unreal Engine system by ID",
+        inputSchema: {
+          type: "object",
+          properties: {
+            systemId: {
+              type: "string",
+              description: "System ID (e.g., 'rendering-system', 'gameplay-framework', 'animation-system')",
+            },
+          },
+          required: ["systemId"],
+        },
+      },
+      {
+        name: "get_ue_systems_by_tag",
+        description: "Get all Unreal Engine systems that match a specific tag",
+        inputSchema: {
+          type: "object",
+          properties: {
+            tag: {
+              type: "string",
+              description: "Tag to filter by (e.g., 'rendering', 'gameplay', 'animation', 'networking')",
+            },
+          },
+          required: ["tag"],
+        },
+      },
+      {
+        name: "get_related_ue_systems",
+        description: "Get systems related to a specific Unreal Engine system",
+        inputSchema: {
+          type: "object",
+          properties: {
+            systemId: {
+              type: "string",
+              description: "System ID to find related systems for",
+            },
+          },
+          required: ["systemId"],
         },
       },
     ],
@@ -1958,6 +2085,94 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         `Failed to delete template: ${error instanceof Error ? error.message : String(error)}`
       );
     }
+  }
+
+  // UE5.6+ Knowledge Database tools
+  if (name === "query_ue_knowledge") {
+    const query = args?.query as string;
+    if (!query) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "Query parameter is required"
+      );
+    }
+
+    const results = searchKnowledge(query);
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Found ${results.length} system(s) matching "${query}":\n\n${JSON.stringify(results, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  if (name === "get_ue_system") {
+    const systemId = args?.systemId as string;
+    if (!systemId) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "systemId parameter is required"
+      );
+    }
+
+    const system = getSystem(systemId);
+    if (!system) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `System not found: ${systemId}`
+      );
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(system, null, 2),
+        },
+      ],
+    };
+  }
+
+  if (name === "get_ue_systems_by_tag") {
+    const tag = args?.tag as string;
+    if (!tag) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "tag parameter is required"
+      );
+    }
+
+    const systems = getSystemsByTag(tag);
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Found ${systems.length} system(s) with tag "${tag}":\n\n${JSON.stringify(systems, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  if (name === "get_related_ue_systems") {
+    const systemId = args?.systemId as string;
+    if (!systemId) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "systemId parameter is required"
+      );
+    }
+
+    const relatedSystems = getRelatedSystems(systemId);
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Found ${relatedSystems.length} related system(s) for "${systemId}":\n\n${JSON.stringify(relatedSystems, null, 2)}`,
+        },
+      ],
+    };
   }
 
   throw new McpError(
