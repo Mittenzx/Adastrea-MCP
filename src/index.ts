@@ -2089,14 +2089,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   // UE5.6+ Knowledge Database tools
   if (name === "query_ue_knowledge") {
-    const query = args?.query as string;
-    if (!query) {
+    if (!args || typeof args.query !== "string") {
       throw new McpError(
         ErrorCode.InvalidParams,
         "Query parameter is required"
       );
     }
 
+    const { query } = args;
     const results = searchKnowledge(query);
     return {
       content: [
@@ -2109,14 +2109,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 
   if (name === "get_ue_system") {
-    const systemId = args?.systemId as string;
-    if (!systemId) {
+    if (!args || typeof args.systemId !== "string") {
       throw new McpError(
         ErrorCode.InvalidParams,
         "systemId parameter is required"
       );
     }
 
+    const { systemId } = args;
     const system = getSystem(systemId);
     if (!system) {
       throw new McpError(
@@ -2136,14 +2136,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 
   if (name === "get_ue_systems_by_tag") {
-    const tag = args?.tag as string;
-    if (!tag) {
+    if (!args || typeof args.tag !== "string") {
       throw new McpError(
         ErrorCode.InvalidParams,
         "tag parameter is required"
       );
     }
 
+    const { tag } = args;
     const systems = getSystemsByTag(tag);
     return {
       content: [
@@ -2156,14 +2156,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 
   if (name === "get_related_ue_systems") {
-    const systemId = args?.systemId as string;
-    if (!systemId) {
+    if (!args || typeof args.systemId !== "string") {
       throw new McpError(
         ErrorCode.InvalidParams,
         "systemId parameter is required"
       );
     }
 
+    const { systemId } = args;
     const relatedSystems = getRelatedSystems(systemId);
     return {
       content: [

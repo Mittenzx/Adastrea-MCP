@@ -275,7 +275,7 @@ export const UnrealEngineKnowledge: Record<string, SystemCategory> = {
         type: 'official_docs'
       },
       {
-        title: 'What\'s New With Unreal Engine 5.6 Animation Features',
+        title: "What's New With Unreal Engine 5.6 Animation Features",
         url: 'https://vagon.io/blog/what-s-new-with-unreal-engine-5-6-all-new-features-you-need-to-check-out',
         type: 'article'
       },
@@ -731,7 +731,7 @@ export const UnrealEngineKnowledge: Record<string, SystemCategory> = {
     references: [
       {
         title: 'Particle Effects in Unreal Engine',
-        url: 'https://dev.epicgames.com/documentation/en-us/unreal-engine/6-16-particle-effects',
+        url: 'https://dev.epicgames.com/documentation/en-us/unreal-engine/particle-effects-in-unreal-engine',
         type: 'official_docs'
       },
       {
@@ -919,8 +919,9 @@ export function getSystem(systemId: string): SystemCategory | undefined {
  * Get all systems in a category (by tag)
  */
 export function getSystemsByTag(tag: string): SystemCategory[] {
+  const lowerTag = tag.toLowerCase();
   return Object.values(UnrealEngineKnowledge).filter(system =>
-    system.tags.includes(tag.toLowerCase())
+    system.tags.some(systemTag => systemTag.toLowerCase() === lowerTag)
   );
 }
 
