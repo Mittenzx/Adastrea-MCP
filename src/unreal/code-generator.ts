@@ -48,6 +48,8 @@ export interface BlueprintCompatibleClassOptions extends UClassGenerationOptions
     blueprintCallable?: boolean;
     blueprintPure?: boolean;
     isConst?: boolean;
+    isVirtual?: boolean;
+    isOverride?: boolean;
     tooltip?: string;
   }>;
 }
@@ -253,8 +255,6 @@ ${className}::${className}()
 
     // Enhance header with properties and functions
     if (includeHeader && result.headerFile) {
-      const apiMacro = `${module.toUpperCase()}_API`;
-      
       // Generate properties section
       const propertiesCode = properties.map(prop => {
         const upropSpecifiers: string[] = [];
@@ -292,12 +292,14 @@ ${className}::${className}()
           `${p.isConst ? 'const ' : ''}${p.type}${p.isReference ? '&' : ''} ${p.name}`
         ).join(', ') || '';
 
+        const virtualKeyword = func.isVirtual ? 'virtual ' : '';
+        const overrideKeyword = func.isOverride ? ' override' : '';
         const constKeyword = func.isConst ? ' const' : '';
         const returnType = func.returnType || 'void';
 
         return `\t/** ${func.tooltip || func.name} */
 \t${specifierStr}
-\t${returnType} ${func.name}(${params})${constKeyword};
+\t${virtualKeyword}${returnType} ${func.name}(${params})${constKeyword}${overrideKeyword};
 `;
       }).join('\n');
 
@@ -350,16 +352,6 @@ ${returnType !== 'void' ? `\treturn ${this.getDefaultReturnValue(returnType)};` 
       parentClass: 'AGameModeBase',
       blueprintType: true,
       blueprintable: true,
-      properties: [
-        {
-          name: 'DefaultPawnClass',
-          type: 'TSubclassOf<APawn>',
-          category: 'Game Mode',
-          editAnywhere: true,
-          blueprintReadWrite: true,
-          tooltip: 'Default pawn class for players',
-        },
-      ],
       functions: [
         {
           name: 'InitGame',
@@ -371,6 +363,8 @@ ${returnType !== 'void' ? `\treturn ${this.getDefaultReturnValue(returnType)};` 
           ],
           category: 'Game Mode',
           tooltip: 'Initialize the game',
+          isVirtual: true,
+          isOverride: true,
         },
       ],
     };
@@ -420,6 +414,8 @@ ${returnType !== 'void' ? `\treturn ${this.getDefaultReturnValue(returnType)};` 
           category: 'Character',
           blueprintCallable: true,
           tooltip: 'Apply damage to this character',
+          isVirtual: true,
+          isOverride: true,
         },
         {
           name: 'GetHealthPercent',
@@ -462,6 +458,8 @@ ${returnType !== 'void' ? `\treturn ${this.getDefaultReturnValue(returnType)};` 
           returnType: 'void',
           category: 'Component',
           tooltip: 'Called when the game starts',
+          isVirtual: true,
+          isOverride: true,
         },
         {
           name: 'TickComponent',
@@ -473,6 +471,8 @@ ${returnType !== 'void' ? `\treturn ${this.getDefaultReturnValue(returnType)};` 
           ],
           category: 'Component',
           tooltip: 'Called every frame',
+          isVirtual: true,
+          isOverride: true,
         },
       ],
     };
@@ -504,6 +504,11 @@ ${returnType !== 'void' ? `\treturn ${this.getDefaultReturnValue(returnType)};` 
       if (prop.replicationType === 'Replicated') {
         upropSpecifiers.push('Replicated');
       } else if (prop.replicationType === 'ReplicatedUsing') {
+        if (!prop.repNotifyFunction) {
+          throw new Error(
+            `Property "${prop.name}" is marked as ReplicatedUsing but no repNotifyFunction was provided.`
+          );
+        }
         upropSpecifiers.push(`ReplicatedUsing=${prop.repNotifyFunction}`);
       }
 
@@ -756,13 +761,44 @@ Data Tables are useful for storing large amounts of structured data that can be 
   }
 
   /**
-   * Get a default return value for a given type
+   * Get a default return value for a given type.
+   *
+   * Note: This uses heuristics based on common Unreal types. For less common
+   * or more complex types, you may need to manually adjust the generated
+   * return value in the resulting C++ code.
    */
   private getDefaultReturnValue(returnType: string): string {
-    if (returnType.includes('*')) return 'nullptr';
-    if (returnType === 'bool') return 'false';
-    if (returnType === 'int32' || returnType === 'float' || returnType === 'double') return '0';
-    if (returnType.startsWith('F') || returnType.startsWith('T')) return `${returnType}()`;
+    const normalized = returnType.trim();
+
+    if (normalized.includes('*')) return 'nullptr';
+    if (normalized === 'bool') return 'false';
+
+    // Common numeric and primitive alias types
+    if (
+      normalized === 'int8' ||
+      normalized === 'int16' ||
+      normalized === 'int32' ||
+      normalized === 'int64' ||
+      normalized === 'uint8' ||
+      normalized === 'uint16' ||
+      normalized === 'uint32' ||
+      normalized === 'uint64' ||
+      normalized === 'float' ||
+      normalized === 'double'
+    ) {
+      return '0';
+    }
+
+    // Unreal-style structs (F*) are typically default-constructible
+    if (normalized.startsWith('F')) return `${normalized}()`;
+
+    // Common Unreal template types (TArray<>, TMap<>, TSet<>, smart pointers, etc.)
+    // Prefer brace initialization for templates.
+    if (normalized.startsWith('T') && normalized.includes('<')) {
+      return `${normalized}{}`;
+    }
+
+    // Fallback: value-initialize the type
     return '{}';
   }
 
