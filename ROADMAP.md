@@ -33,7 +33,12 @@
 - Provide AI agents with project context
 - Full GitHub API access to Adastrea repository
 - Comprehensive knowledge of 22+ Adastrea game systems
-- **Deep Unreal Engine understanding:** Parse .uproject files, analyze C++ classes with Unreal macros (UCLASS, USTRUCT, UENUM, UINTERFACE), extract Blueprint metadata, manage assets, track plugins and modules
+- **Deep Unreal Engine understanding:**
+  - Parse .uproject files and extract engine version, modules, plugins
+  - Analyze C++ classes with Unreal macros (UCLASS, USTRUCT, UENUM, UINTERFACE)
+  - Extract Blueprint metadata and class hierarchies
+  - Manage and categorize assets (Meshes, Materials, Textures, etc.)
+  - Track plugins and modules with dependencies
 - Static code analysis and project structure validation
 - Asset categorization and search capabilities
 
