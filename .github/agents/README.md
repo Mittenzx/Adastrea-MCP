@@ -6,17 +6,28 @@ This directory contains GitHub Copilot custom agent configurations designed for 
 
 ### 🎮 Unreal Engine Agent (`unreal-engine.md`)
 
-Expert Unreal Engine 5.6+ specialist for C++ and Blueprint development.
+Expert Unreal Engine 5.6+ specialist for C++ and Blueprint development, with deep knowledge of the Adastrea space flight game project.
 
 **Capabilities:**
 - C++ development with Unreal Engine macros (UCLASS, USTRUCT, UENUM, etc.)
 - Blueprint visual scripting and Blueprint-C++ interaction
 - Comprehensive knowledge of UE5.6+ systems (Lumen, Nanite, Chaos, etc.)
+- **Deep Adastrea project knowledge** (22 game systems, architecture, tools)
 - Integration with Adastrea-MCP for project analysis
 - Epic Games coding standards enforcement
 - Performance optimization guidance
 - Networking and replication best practices
 - Gameplay Ability System (GAS) expertise
+
+**Adastrea-Specific Knowledge:**
+- Spaceship System with FloatingPawnMovement
+- Faction AI with 8 personality types
+- Way System for guilds and alliances
+- Personnel System with 31 role types
+- Trading, Combat, Quest systems
+- Enhanced Input with 30+ actions
+- Python automation tools
+- Data-driven Blueprint Data Asset architecture
 
 **Use Cases:**
 - Creating new Actor classes and Components

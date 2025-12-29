@@ -12,6 +12,7 @@ Real-world examples of using the Unreal Engine agent for common development task
 6. [Performance Optimization](#performance-optimization)
 7. [Project Analysis](#project-analysis)
 8. [Knowledge Queries](#knowledge-queries)
+9. [Adastrea Project Examples](#adastrea-project-examples)
 
 ---
 
@@ -638,6 +639,321 @@ query_ue_knowledge "Lumen rendering"
 
 ---
 
+## Adastrea Project Examples
+
+### Example 9: Working with Adastrea's Spaceship System
+
+**User Query:**
+```
+@unreal_engine I'm working on the Adastrea project. Create a new spaceship type that's faster but has less cargo capacity than the default scout ship.
+```
+
+**Agent Response:**
+```
+For the Adastrea project, you'll want to create a new Blueprint Data Asset that extends the Spaceship Data Asset class. Here's how:
+
+**1. Create the Data Asset:**
+- In Content Browser, navigate to `Content/DataAssets/Spaceships/`
+- Right-click → Blueprint → Blueprint Class → Choose `SpaceshipDataAsset` as parent
+- Name it `DA_Spaceship_Interceptor`
+
+**2. Configure the Data Asset:**
+```cpp
+// Properties to set in the Blueprint Data Asset:
+
+Ship Name: "Interceptor"
+Max Speed: 2000.0 (vs Scout's 1500.0)
+Acceleration: 1500.0 (vs Scout's 1200.0)
+Max Cargo Capacity: 150 (vs Scout's 300)
+Hull Strength: 800 (vs Scout's 1000)
+Shield Capacity: 600
+
+// FloatingPawnMovement Settings:
+Max Speed: 2000.0
+Acceleration: 1500.0
+Deceleration: 1500.0
+Turn Speed: 80.0
+
+// Visual Settings:
+Mesh: [Select your ship mesh]
+Material: [Select ship material]
+Engine Particle System: [Enhanced effect for faster ship]
+```
+
+**3. Integration Points:**
+Since Adastrea uses a data-driven approach:
+- The Personnel System will automatically recognize the new ship for crew assignments
+- The Trading System will use the Cargo Capacity value
+- The Faction AI will evaluate it based on combat stats
+- The Quest System can reference it by Data Asset
+
+**4. Testing:**
+Use the Python automation tools:
+```python
+# In ScenePopulator.py, add:
+unreal.EditorAssetLibrary.load_asset("/Game/DataAssets/Spaceships/DA_Spaceship_Interceptor")
+```
+```
+
+---
+
+### Example 10: Adastrea Faction System Integration
+
+**User Query:**
+```
+@unreal_engine In Adastrea, how do I create a new faction that's hostile to pirates but friendly to traders?
+```
+
+**Agent Response:**
+```
+For the Adastrea Faction AI system, create a new Faction Data Asset:
+
+**1. Create Faction Data Asset:**
+- Location: `Content/DataAssets/Factions/`
+- Type: `FactionDataAsset`
+- Name: `DA_Faction_SpaceGuard`
+
+**2. Configure Faction Properties:**
+```cpp
+// Basic Properties:
+Faction Name: "Space Guard"
+Faction Tag: "SpaceGuard"
+Starting Reputation: 0 (Neutral)
+
+// Personality Disposition (1 of 8 types):
+Personality: Lawful  // Options: Aggressive, Defensive, Neutral, Lawful, Chaotic, Friendly, Hostile, Opportunistic
+
+// Default Relationships (configure in Blueprint):
+Relationships:
+  - Faction: DA_Faction_Pirates, Reputation: -80 (Hostile)
+  - Faction: DA_Faction_Traders, Reputation: +60 (Friendly)
+  - Faction: DA_Faction_Independent, Reputation: 0 (Neutral)
+
+// Behavior Parameters:
+Aggression Level: 0.3
+Trade Willingness: 0.7
+Diplomacy Preference: 0.8
+```
+
+**3. Integration with Other Systems:**
+
+The faction will automatically integrate with:
+- **Personnel System:** NPCs can be assigned to this faction (use one of 31 role types)
+- **Trading System:** Trade prices affected by reputation
+- **Combat System:** Auto-targeting based on hostile relationships
+- **Quest System:** Quests can require faction reputation thresholds
+- **Way System:** Can create alliances with other factions
+
+**4. C++ Interface (if needed):**
+```cpp
+// Get faction reputation
+UFactionComponent* FactionComp = Player->FindComponentByClass<UFactionComponent>();
+float Reputation = FactionComp->GetReputationWithFaction(FGameplayTag::RequestGameplayTag("SpaceGuard"));
+
+// Modify reputation
+FactionComp->ModifyReputation(FGameplayTag::RequestGameplayTag("SpaceGuard"), 10.0f);
+
+// Check relationship
+EFactionRelationship Relationship = FactionComp->GetRelationshipWithFaction(FGameplayTag::RequestGameplayTag("SpaceGuard"));
+```
+
+**5. Event Integration:**
+The Faction AI will automatically:
+- React to player actions based on personality type
+- Update relationships based on combat/trade interactions
+- Trigger diplomatic events through the event system
+```
+
+---
+
+### Example 11: Adastrea Way System - Creating a Guild
+
+**User Query:**
+```
+@unreal_engine How do I create a new guild in Adastrea's Way System for bounty hunters?
+```
+
+**Agent Response:**
+```
+The Way System in Adastrea manages specialized guilds and micro-alliances. Here's how to create a Bounty Hunter guild:
+
+**1. Create Way Data Asset:**
+- Location: `Content/DataAssets/Ways/`
+- Type: `WayDataAsset`
+- Name: `DA_Way_BountyHunters`
+
+**2. Configure Way Properties:**
+```cpp
+// Way Identity:
+Way Name: "Bounty Hunters Guild"
+Way Tag: "BountyHunters"
+Way Type: Guild  // Options: Guild, Alliance, Network, Order
+
+// Membership Requirements:
+Required Reputation: 20
+Required Level: 5
+Entry Fee: 1000 Credits
+Required Skills: [Combat, Tracking]
+
+// Way Benefits:
+Member Benefits:
+  - Access to bounty board
+  - 15% bonus on bounty rewards
+  - Special equipment vendors
+  - Safe houses in major systems
+
+// Quest Integration:
+Available Quest Types: [Bounty, Assassination, Capture]
+Quest Difficulty Range: [Medium, Hard, VeryHard]
+```
+
+**3. Integration with Personnel System:**
+```cpp
+// Define guild-specific roles (from the 31 available):
+Guild Roles:
+  - Guild Master (Personnel Role: Leader)
+  - Bounty Coordinator (Personnel Role: QuestGiver)
+  - Weapons Specialist (Personnel Role: Merchant)
+  - Training Officer (Personnel Role: Trainer)
+  - Members (Personnel Role: Generic)
+```
+
+**4. Link to Trading System:**
+```cpp
+// Create guild-specific items:
+Guild Vendor Items:
+  - Tracking Devices
+  - Stun Weapons
+  - Prisoner Pods (cargo type)
+  - Special Armor
+```
+
+**5. Blueprint Event Hooks:**
+```cpp
+// Events that Ways can respond to:
+UFUNCTION(BlueprintImplementableEvent)
+void OnMemberJoined(APlayerCharacter* NewMember);
+
+UFUNCTION(BlueprintImplementableEvent)
+void OnBountyCompleted(APlayerCharacter* Member, int32 BountyValue);
+
+UFUNCTION(BlueprintImplementableEvent)
+void OnReputationThresholdReached(APlayerCharacter* Member, int32 NewTier);
+```
+
+**6. Testing with Python Tools:**
+```python
+# In SmokeTest.py, add guild tests:
+def test_way_system_bounty_hunters():
+    way_asset = unreal.EditorAssetLibrary.load_asset(
+        "/Game/DataAssets/Ways/DA_Way_BountyHunters"
+    )
+    assert way_asset is not None
+    # Test guild membership requirements
+    # Test quest generation
+```
+```
+
+---
+
+### Example 12: Adastrea Enhanced Input Integration
+
+**User Query:**
+```
+@unreal_engine I want to add a new input action to Adastrea's Enhanced Input System for a ship boost ability
+```
+
+**Agent Response:**
+```
+Adastrea uses UE5's Enhanced Input System with 30+ predefined actions. Here's how to add a boost action:
+
+**1. Create Input Action Asset:**
+- Location: `Content/Input/Actions/`
+- Type: `Input Action`
+- Name: `IA_ShipBoost`
+
+**2. Configure Input Action:**
+```cpp
+Value Type: Digital (bool)
+Consumes Input: true
+Triggers: [Pressed, Released]
+```
+
+**3. Add to Input Mapping Context:**
+Open `Content/Input/IMC_Spaceship.uasset` and add:
+```cpp
+Mapping:
+  Input Action: IA_ShipBoost
+  Key: Left Shift
+  Modifiers: None
+  Triggers: [Pressed, Released]
+
+// Alternative gamepad binding:
+Mapping:
+  Input Action: IA_ShipBoost
+  Key: Gamepad Face Button Left (X/Square)
+```
+
+**4. Bind in C++ (Spaceship Pawn):**
+```cpp
+// In ASpaceshipPawn::SetupPlayerInputComponent
+void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+    
+    if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+    {
+        // Bind boost action
+        EnhancedInput->BindAction(BoostAction, ETriggerEvent::Started, this, &ASpaceshipPawn::StartBoost);
+        EnhancedInput->BindAction(BoostAction, ETriggerEvent::Completed, this, &ASpaceshipPawn::StopBoost);
+    }
+}
+
+void ASpaceshipPawn::StartBoost()
+{
+    if (!bCanBoost || BoostFuel <= 0.0f)
+        return;
+    
+    bIsBoosting = true;
+    
+    // Modify FloatingPawnMovement speed
+    if (UFloatingPawnMovement* Movement = GetMovementComponent())
+    {
+        Movement->MaxSpeed = NormalMaxSpeed * BoostMultiplier;
+    }
+    
+    // Visual feedback
+    if (BoostParticleSystem)
+    {
+        BoostParticleComponent->Activate();
+    }
+}
+
+void ASpaceshipPawn::StopBoost()
+{
+    bIsBoosting = false;
+    
+    if (UFloatingPawnMovement* Movement = GetMovementComponent())
+    {
+        Movement->MaxSpeed = NormalMaxSpeed;
+    }
+    
+    if (BoostParticleComponent)
+    {
+        BoostParticleComponent->Deactivate();
+    }
+}
+```
+
+**5. Integration with Adastrea Systems:**
+- **Spaceship Data Asset:** Add boost parameters (fuel capacity, recharge rate, multiplier)
+- **Audio System:** Play engine boost sound
+- **Personnel System:** Engineer crew members could improve boost efficiency
+- **UI System:** Add boost fuel bar to HUD
+```
+
+---
+
 ## Summary
 
 These examples demonstrate:
@@ -647,8 +963,12 @@ These examples demonstrate:
 - ✅ Performance optimization techniques
 - ✅ MCP tool integration for project analysis
 - ✅ Knowledge database queries
+- ✅ Adastrea project-specific systems (Spaceship, Faction, Way, Enhanced Input)
+- ✅ Data-driven design with Blueprint Data Assets
 
 For more examples and detailed guidance, see:
 - [Main Documentation](.github/agents/README.md)
 - [Unreal Engine Docs](https://docs.unrealengine.com/)
 - [Epic Games Coding Standards](https://docs.unrealengine.com/en-US/epic-cplusplus-coding-standard/)
+- [Adastrea Repository](https://github.com/Mittenzx/Adastrea)
+- [Adastrea Documentation](https://github.com/Mittenzx/Adastrea/blob/main/DOCUMENTATION_INDEX.md)

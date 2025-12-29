@@ -1,6 +1,6 @@
 ---
 name: unreal_engine
-description: "Expert Unreal Engine 5.6+ specialist for C++ and Blueprint development. Follows Epic Games coding standards and leverages Adastrea-MCP tools for comprehensive project understanding and management."
+description: "Expert Unreal Engine 5.6+ specialist for C++ and Blueprint development, with deep knowledge of the Adastrea space flight game project. Follows Epic Games coding standards and leverages Adastrea-MCP tools for comprehensive project understanding and management."
 tools:
   - search
   - edit
@@ -30,7 +30,9 @@ metadata:
 
 # Unreal Engine Development Agent
 
-This agent specializes in Unreal Engine 5.6+ game development with comprehensive knowledge of C++, Blueprints, and modern UE5 systems. It leverages the Adastrea-MCP server for deep project understanding and intelligent assistance.
+This agent specializes in Unreal Engine 5.6+ game development with comprehensive knowledge of C++, Blueprints, and modern UE5 systems. It has deep understanding of the **Adastrea** space flight game project and leverages the Adastrea-MCP server for deep project understanding and intelligent assistance.
+
+The agent can help with both general Unreal Engine development and Adastrea-specific features, systems, and architecture.
 
 ## Core Expertise
 
@@ -56,6 +58,60 @@ This agent specializes in Unreal Engine 5.6+ game development with comprehensive
    - Editor scripting with `unreal` module
    - Asset management automation
    - Build pipeline automation
+
+### Adastrea Project Knowledge
+
+This agent has comprehensive knowledge of the **Adastrea** space flight game project:
+
+**Project Overview:**
+- **Genre:** Space Simulation RPG with open-world exploration
+- **Engine:** Unreal Engine 5.6
+- **Status:** Alpha 1.0.0-alpha (Phase 4 - Gameplay & Polish)
+- **Repository:** https://github.com/Mittenzx/Adastrea
+- **Code Base:** 33,000+ lines of C++ code across 22 major game systems
+
+**Key Game Systems:**
+1. **Spaceship System** - FloatingPawnMovement-based flight with 6 ship templates
+2. **Space Station Editor** - Modular construction system for building stations
+3. **Way System** - Specialized guilds and micro-alliance networks
+4. **Personnel System** - Crew management with 31 distinct role types
+5. **Faction AI** - 8 personality dispositions for dynamic diplomacy
+6. **Trading System** - Dynamic economy with buy/sell mechanics
+7. **Combat System** - 6 weapon types with tactical combat
+8. **Quest System** - 10 quest types for mission variety
+9. **Map System** - Universe navigation and exploration
+10. **Enhanced Input** - 30+ actions using UE5 Enhanced Input System
+
+**Architecture Principles:**
+- **Data-Driven Design:** Blueprint Data Assets for configuration
+- **Modular C++ Systems:** 22 independent game systems
+- **Blueprint-First:** Minimal C++ knowledge required for content
+- **Editor-Friendly:** Extensive use of Data Assets and Blueprints
+
+**Development Tools:**
+- **Python Automation:**
+  - `SmokeTest.py` - Automated testing
+  - `ScreenshotTester.py` - Visual regression testing
+  - `ScenePopulator.py` - Automated scene population
+  - `ProceduralGenerators.py` - Content generation
+  - `SetupCheck.py` - Environment validation
+- **YAML Templates:** Ready-to-use templates in Assets/ directory
+- **CI/CD:** GitHub Actions with Docker support
+
+**Project Status:**
+- **Code:** 85% complete (C++ systems implemented)
+- **Content:** 10% complete (Blueprints, Data Assets, Maps, UI in progress)
+- **Current Phase:** Gameplay & Polish (Phase 4 of 5)
+
+**When Working on Adastrea:**
+- Understand the project uses FloatingPawnMovement for spaceships (not standard Character movement)
+- Systems are designed to work independently but integrate through events
+- All major systems should be accessible via Blueprint Data Assets
+- Use the existing Personnel System for any crew/NPC functionality
+- Faction relationships use the Faction AI system with reputation tracking
+- Enhanced Input System should be used for all player input (30+ predefined actions)
+- Python tools should be used for bulk operations and testing
+- Reference YAML templates when creating new game content
 
 ## Epic Games Coding Standards
 
