@@ -85,6 +85,14 @@ The pre-populated data combined with live repository access ensures AI agents ha
 - **Web-Sourced Information**: Curated from official documentation, community forums, tutorials, and expert resources
 - **MCP Resources & Tools**: Access via resources (`unreal://knowledge/*`) and query tools
 
+### GitHub Copilot Agent (✨ New)
+- **Custom Unreal Engine Agent**: Pre-configured GitHub Copilot agent for UE5.6+ development
+- **Epic Games Standards**: Enforces official Epic Games coding conventions and best practices
+- **MCP Integration**: Leverages all Adastrea-MCP tools for intelligent project analysis
+- **Comprehensive Knowledge**: Built-in expertise in all major UE5.6+ systems
+- **Multi-Repository Deployment**: Can be rolled out across all your Unreal Engine repositories
+- **Reusable**: Works with any Unreal Engine project, not just Adastrea
+
 ## Installation
 
 ```bash
@@ -692,6 +700,81 @@ Get systems related to a specific Unreal Engine system.
 
 - **Project Information**: Stored in `game-project-data.json` in the package root directory. This file is automatically created when you first update project information.
 - **Actor Templates**: Stored in `.adastrea/actor-templates.json` in the project root directory. This file is automatically created when you create your first actor template.
+
+## GitHub Copilot Integration
+
+Adastrea-MCP includes a pre-configured GitHub Copilot agent that can be deployed across all your Unreal Engine repositories for consistent, expert-level AI assistance.
+
+### Features
+
+- **Expert UE5.6+ Knowledge**: Comprehensive understanding of modern Unreal Engine systems
+- **Epic Games Standards**: Enforces official coding conventions and best practices
+- **MCP Tool Integration**: Automatically uses Adastrea-MCP tools for project analysis
+- **Smart Context Awareness**: Understands C++, Blueprints, and their interactions
+- **Multi-Repository Support**: Deploy once, use across all your Unreal projects
+
+### Quick Start
+
+#### Option 1: Single Repository
+
+Copy the agent configuration to your Unreal project:
+
+```bash
+# From your Unreal project root
+mkdir -p .github/agents
+cp /path/to/Adastrea-MCP/.github/agents/unreal-engine.md .github/agents/
+```
+
+#### Option 2: Organization-Wide (Recommended)
+
+Deploy across all repositories in your organization:
+
+1. Create or use your organization's `.github` repository
+2. Copy agents to the `agents/` directory
+3. All organization repositories automatically get access
+
+See [.github/agents/README.md](.github/agents/README.md) for detailed deployment instructions and usage examples.
+
+### Using the Agent
+
+In your IDE with GitHub Copilot:
+
+```
+@unreal_engine Create a health component with replication
+@unreal_engine How do I implement Lumen in my level?
+@unreal_engine Optimize this actor for multiplayer
+```
+
+The agent will:
+- Follow Epic Games coding standards
+- Use MCP tools to understand your project
+- Query the knowledge database for best practices
+- Generate production-ready code
+- Provide context-aware suggestions
+
+### Example Workflows
+
+**Creating Actor Classes:**
+```
+@unreal_engine I need a character with health, stamina, and sprint ability
+```
+
+**Blueprint Integration:**
+```
+@unreal_engine Make this C++ function callable from Blueprints
+```
+
+**Performance Optimization:**
+```
+@unreal_engine This actor is causing performance issues [paste code]
+```
+
+**System Implementation:**
+```
+@unreal_engine Implement a quest system with save/load support
+```
+
+For complete documentation, see [GitHub Copilot Agent Guide](.github/agents/README.md).
 
 ## Benefits for AI Agents
 
