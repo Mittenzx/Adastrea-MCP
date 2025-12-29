@@ -172,7 +172,7 @@ void AMyActor::BeginPlay()
 
 ### Smart Pointers
 ```cpp
-// Use TObjectPtr for UPROPERTY pointers (UE5.0+)
+// Use TObjectPtr for UPROPERTY pointers (UE5.1+, fully stable)
 UPROPERTY()
 TObjectPtr<UStaticMeshComponent> MeshComponent;
 

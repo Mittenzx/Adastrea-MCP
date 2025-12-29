@@ -18,9 +18,13 @@ Perfect for testing or single-project use.
 # 1. Navigate to your Unreal Engine project
 cd /path/to/your/UnrealProject
 
-# 2. Copy the agent
+# 2. Copy the agent (or download manually for security verification)
 mkdir -p .github/agents
+# Option A: Direct download
 curl -o .github/agents/unreal-engine.md https://raw.githubusercontent.com/Mittenzx/Adastrea-MCP/main/.github/agents/unreal-engine.md
+# Option B: Clone and copy (recommended for verification)
+# git clone https://github.com/Mittenzx/Adastrea-MCP.git /tmp/adastrea-mcp
+# cp /tmp/adastrea-mcp/.github/agents/unreal-engine.md .github/agents/
 
 # 3. Commit and push
 git add .github/agents/

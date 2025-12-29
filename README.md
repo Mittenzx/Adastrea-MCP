@@ -722,7 +722,8 @@ Copy the agent configuration to your Unreal project:
 ```bash
 # From your Unreal project root
 mkdir -p .github/agents
-cp /path/to/Adastrea-MCP/.github/agents/unreal-engine.md .github/agents/
+# Replace /path/to/your/Adastrea-MCP with actual path
+cp /path/to/your/Adastrea-MCP/.github/agents/unreal-engine.md .github/agents/
 ```
 
 #### Option 2: Organization-Wide (Recommended)

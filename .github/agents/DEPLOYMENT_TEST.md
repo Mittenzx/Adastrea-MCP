@@ -56,8 +56,8 @@ This guide helps you verify that the Unreal Engine GitHub Copilot agent can be s
 1. **Navigate to organization's `.github` repository:**
    ```bash
    cd /path/to/your-org/.github
-   # Or create it if it doesn't exist:
-   # gh repo create your-org/.github --public --confirm
+   # Or create it if it doesn't exist (use --private for internal standards):
+   # gh repo create your-org/.github --private --confirm
    ```
 
 2. **Copy agent files:**

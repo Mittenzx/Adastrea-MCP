@@ -108,22 +108,25 @@ void APickupActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
         return;
     }
     
-    // Check if the overlapping actor is a player character
-    if (OtherActor->IsA(APawn::StaticClass()))
+    // Check if the overlapping actor is a player-controlled character
+    if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+    {
+        if (Character->IsPlayerControlled())
     {
         bWasCollected = true;
         
-        // Play pickup sound
-        if (PickupSound)
-        {
-            UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
+            // Play pickup sound
+            if (PickupSound)
+            {
+                UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
+            }
+            
+            // Call Blueprint event
+            OnPickedUp(OtherActor);
+            
+            // Destroy after a short delay to let sound play
+            SetLifeSpan(0.5f);
         }
-        
-        // Call Blueprint event
-        OnPickedUp(OtherActor);
-        
-        // Destroy after a short delay to let sound play
-        SetLifeSpan(0.5f);
     }
 }
 ```
@@ -279,6 +282,8 @@ void UHealthComponent::OnRep_CurrentHealth(float OldHealth)
 void UHealthComponent::HandleDeath(AActor* Killer)
 {
     bIsDead = true;
+    
+    // Killer can be null (e.g., environmental damage)
     OnDeath.Broadcast(Killer);
 }
 ```
