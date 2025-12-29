@@ -19,6 +19,13 @@
 - Two MCP resources: `game://project/info` and `game://project/summary`
 - Three MCP tools: `update_game_info`, `get_game_info`, `clear_game_info`
 - Pre-populated Adastrea project data
+- **Phase 1 (✅ Completed):** Unreal Engine project structure understanding
+  - 7 new Unreal-specific MCP resources
+  - 7 new Unreal-specific MCP tools
+  - C++ code analysis (UCLASS, USTRUCT, UENUM, UINTERFACE detection)
+  - Blueprint metadata extraction
+  - Asset management and categorization
+  - Plugin and module registry
 
 ### 🎯 Current Capabilities
 - Store and retrieve game project information
@@ -26,13 +33,20 @@
 - Provide AI agents with project context
 - Full GitHub API access to Adastrea repository
 - Comprehensive knowledge of 22+ Adastrea game systems
-- Understanding of Unreal Engine 5.6 project structure
+- **Deep Unreal Engine understanding:**
+  - Parse .uproject files and extract engine version, modules, plugins
+  - Analyze C++ classes with Unreal macros (UCLASS, USTRUCT, UENUM, UINTERFACE)
+  - Extract Blueprint metadata and class hierarchies
+  - Manage and categorize assets (Meshes, Materials, Textures, etc.)
+  - Track plugins and modules with dependencies
+- Static code analysis and project structure validation
+- Asset categorization and search capabilities
 
 ### ⚠️ Current Limitations
 - No direct Unreal Engine integration (Adastrea-Director provides this)
-- Limited to metadata updates (no live code analysis yet)
-- No understanding of Unreal-specific systems (Phase 1 addresses this)
+- Static analysis only (no live code analysis or real-time editor integration yet)
 - No real-time project inspection (Phase 2 addresses this via Adastrea-Director)
+- Limited Blueprint analysis (metadata only, not full node graph parsing)
 
 > **Note:** Adastrea-MCP focuses on static analysis and project metadata. For live Unreal Engine editor integration, see [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director).
 
