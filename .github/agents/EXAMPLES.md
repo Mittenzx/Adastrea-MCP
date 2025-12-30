@@ -75,6 +75,7 @@ private:
 #include "PickupActor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
 APickupActor::APickupActor()
