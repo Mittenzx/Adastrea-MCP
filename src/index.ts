@@ -43,6 +43,14 @@ import {
   getKnowledgeSummary,
   type SystemCategory
 } from "./unreal/knowledge-database.js";
+import {
+  codeGenerator,
+  type UClassGenerationOptions,
+  type BlueprintCompatibleClassOptions,
+  type ReplicationOptions,
+  type DataAssetOptions,
+  type DataTableRowOptions
+} from "./unreal/code-generator.js";
 
 // Initialize storage for game project metadata
 const storage = new GameProjectStorage();
@@ -1253,6 +1261,295 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["systemId"],
         },
       },
+      // Phase 3.1: Intelligent Code Generation Tools
+      {
+        name: "generate_uclass",
+        description: "Generate a UClass following Unreal Engine conventions. Creates header and source files for a basic C++ class.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            className: {
+              type: "string",
+              description: "Name of the class (e.g., 'AMyActor', 'UMyObject')",
+            },
+            parentClass: {
+              type: "string",
+              description: "Parent class (e.g., 'AActor', 'UObject'). Default: 'UObject'",
+            },
+            module: {
+              type: "string",
+              description: "Module name. Default: 'YourProject'",
+            },
+            blueprintType: {
+              type: "boolean",
+              description: "Whether this class can be used as a Blueprint type",
+            },
+            blueprintable: {
+              type: "boolean",
+              description: "Whether Blueprints can be derived from this class",
+            },
+            abstract: {
+              type: "boolean",
+              description: "Whether this is an abstract class",
+            },
+            config: {
+              type: "string",
+              description: "Config category (e.g., 'Game', 'Engine')",
+            },
+          },
+          required: ["className"],
+        },
+      },
+      {
+        name: "generate_blueprint_compatible_class",
+        description: "Generate a Blueprint-compatible C++ class with properties and functions exposed to Blueprints",
+        inputSchema: {
+          type: "object",
+          properties: {
+            className: {
+              type: "string",
+              description: "Name of the class",
+            },
+            parentClass: {
+              type: "string",
+              description: "Parent class. Default: 'UObject'",
+            },
+            module: {
+              type: "string",
+              description: "Module name. Default: 'YourProject'",
+            },
+            properties: {
+              type: "array",
+              description: "Properties to expose to Blueprints",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  type: { type: "string" },
+                  category: { type: "string" },
+                  editAnywhere: { type: "boolean" },
+                  blueprintReadWrite: { type: "boolean" },
+                  blueprintReadOnly: { type: "boolean" },
+                  defaultValue: { type: "string" },
+                  tooltip: { type: "string" },
+                },
+                required: ["name", "type"],
+              },
+            },
+            functions: {
+              type: "array",
+              description: "Functions to expose to Blueprints",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  returnType: { type: "string" },
+                  parameters: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        type: { type: "string" },
+                        isConst: { type: "boolean" },
+                        isReference: { type: "boolean" },
+                      },
+                      required: ["name", "type"],
+                    },
+                  },
+                  category: { type: "string" },
+                  blueprintCallable: { type: "boolean" },
+                  blueprintPure: { type: "boolean" },
+                  isConst: { type: "boolean" },
+                  tooltip: { type: "string" },
+                },
+                required: ["name"],
+              },
+            },
+          },
+          required: ["className"],
+        },
+      },
+      {
+        name: "generate_game_mode",
+        description: "Generate a GameMode class following UE best practices",
+        inputSchema: {
+          type: "object",
+          properties: {
+            className: {
+              type: "string",
+              description: "Name of the GameMode class (e.g., 'AMyGameMode')",
+            },
+            module: {
+              type: "string",
+              description: "Module name. Default: 'YourProject'",
+            },
+          },
+          required: ["className"],
+        },
+      },
+      {
+        name: "generate_character_class",
+        description: "Generate a Character class with health system and common functionality",
+        inputSchema: {
+          type: "object",
+          properties: {
+            className: {
+              type: "string",
+              description: "Name of the Character class (e.g., 'AMyCharacter')",
+            },
+            module: {
+              type: "string",
+              description: "Module name. Default: 'YourProject'",
+            },
+          },
+          required: ["className"],
+        },
+      },
+      {
+        name: "generate_actor_component",
+        description: "Generate an ActorComponent class for reusable functionality",
+        inputSchema: {
+          type: "object",
+          properties: {
+            className: {
+              type: "string",
+              description: "Name of the ActorComponent class (e.g., 'UMyComponent')",
+            },
+            module: {
+              type: "string",
+              description: "Module name. Default: 'YourProject'",
+            },
+          },
+          required: ["className"],
+        },
+      },
+      {
+        name: "generate_replication_code",
+        description: "Generate network replication code for properties and RPCs",
+        inputSchema: {
+          type: "object",
+          properties: {
+            className: {
+              type: "string",
+              description: "Name of the class to add replication to",
+            },
+            properties: {
+              type: "array",
+              description: "Properties to replicate",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  type: { type: "string" },
+                  replicationType: {
+                    type: "string",
+                    enum: ["Replicated", "ReplicatedUsing"],
+                  },
+                  repNotifyFunction: { type: "string" },
+                  condition: { type: "string" },
+                },
+                required: ["name", "type", "replicationType"],
+              },
+            },
+            rpcs: {
+              type: "array",
+              description: "Remote Procedure Calls to generate",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  type: {
+                    type: "string",
+                    enum: ["Server", "Client", "NetMulticast"],
+                  },
+                  reliable: { type: "boolean" },
+                  parameters: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        type: { type: "string" },
+                      },
+                      required: ["name", "type"],
+                    },
+                  },
+                },
+                required: ["name", "type"],
+              },
+            },
+          },
+          required: ["className", "properties"],
+        },
+      },
+      {
+        name: "generate_data_asset",
+        description: "Generate a UDataAsset class for storing configuration data",
+        inputSchema: {
+          type: "object",
+          properties: {
+            className: {
+              type: "string",
+              description: "Name of the DataAsset class (e.g., 'UMyDataAsset')",
+            },
+            module: {
+              type: "string",
+              description: "Module name. Default: 'YourProject'",
+            },
+            properties: {
+              type: "array",
+              description: "Properties for the data asset",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  type: { type: "string" },
+                  category: { type: "string" },
+                  editAnywhere: { type: "boolean" },
+                  defaultValue: { type: "string" },
+                  tooltip: { type: "string" },
+                },
+                required: ["name", "type"],
+              },
+            },
+          },
+          required: ["className", "properties"],
+        },
+      },
+      {
+        name: "generate_data_table",
+        description: "Generate a USTRUCT for use as a DataTable row structure",
+        inputSchema: {
+          type: "object",
+          properties: {
+            structName: {
+              type: "string",
+              description: "Name of the struct (e.g., 'FMyTableRow')",
+            },
+            module: {
+              type: "string",
+              description: "Module name. Default: 'YourProject'",
+            },
+            properties: {
+              type: "array",
+              description: "Properties for the data table row",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  type: { type: "string" },
+                  editAnywhere: { type: "boolean" },
+                  defaultValue: { type: "string" },
+                  tooltip: { type: "string" },
+                },
+                required: ["name", "type"],
+              },
+            },
+          },
+          required: ["structName", "properties"],
+        },
+      },
     ],
   };
 });
@@ -2173,6 +2470,374 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         },
       ],
     };
+  }
+
+  // Phase 3.1: Intelligent Code Generation Tools
+  if (name === "generate_uclass") {
+    if (!args || !args.className) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "className is required"
+      );
+    }
+
+    try {
+      const options: UClassGenerationOptions = {
+        className: args.className as string,
+        parentClass: args.parentClass as string | undefined,
+        module: args.module as string | undefined,
+        blueprintType: args.blueprintType as boolean | undefined,
+        blueprintable: args.blueprintable as boolean | undefined,
+        abstract: args.abstract as boolean | undefined,
+        config: args.config as string | undefined,
+      };
+
+      const result = codeGenerator.generateUClass(options);
+      
+      let responseText = `Generated ${args.className} class\n\n`;
+      
+      if (result.headerFile) {
+        responseText += `=== ${result.headerFile.filename} ===\n\`\`\`cpp\n${result.headerFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.sourceFile) {
+        responseText += `=== ${result.sourceFile.filename} ===\n\`\`\`cpp\n${result.sourceFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.instructions) {
+        responseText += `${result.instructions}`;
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: responseText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate UClass: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_blueprint_compatible_class") {
+    if (!args || !args.className) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "className is required"
+      );
+    }
+
+    try {
+      const options: BlueprintCompatibleClassOptions = {
+        className: args.className as string,
+        parentClass: args.parentClass as string | undefined,
+        module: args.module as string | undefined,
+        properties: args.properties as any,
+        functions: args.functions as any,
+      };
+
+      const result = codeGenerator.generateBlueprintCompatibleClass(options);
+      
+      let responseText = `Generated Blueprint-compatible ${args.className} class\n\n`;
+      
+      if (result.headerFile) {
+        responseText += `=== ${result.headerFile.filename} ===\n\`\`\`cpp\n${result.headerFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.sourceFile) {
+        responseText += `=== ${result.sourceFile.filename} ===\n\`\`\`cpp\n${result.sourceFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.instructions) {
+        responseText += `${result.instructions}`;
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: responseText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate Blueprint-compatible class: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_game_mode") {
+    if (!args || !args.className) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "className is required"
+      );
+    }
+
+    try {
+      const result = codeGenerator.generateGameMode(
+        args.className as string,
+        args.module as string | undefined
+      );
+      
+      let responseText = `Generated GameMode class ${args.className}\n\n`;
+      
+      if (result.headerFile) {
+        responseText += `=== ${result.headerFile.filename} ===\n\`\`\`cpp\n${result.headerFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.sourceFile) {
+        responseText += `=== ${result.sourceFile.filename} ===\n\`\`\`cpp\n${result.sourceFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.instructions) {
+        responseText += `${result.instructions}`;
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: responseText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate GameMode: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_character_class") {
+    if (!args || !args.className) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "className is required"
+      );
+    }
+
+    try {
+      const result = codeGenerator.generateCharacter(
+        args.className as string,
+        args.module as string | undefined
+      );
+      
+      let responseText = `Generated Character class ${args.className}\n\n`;
+      
+      if (result.headerFile) {
+        responseText += `=== ${result.headerFile.filename} ===\n\`\`\`cpp\n${result.headerFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.sourceFile) {
+        responseText += `=== ${result.sourceFile.filename} ===\n\`\`\`cpp\n${result.sourceFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.instructions) {
+        responseText += `${result.instructions}`;
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: responseText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate Character class: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_actor_component") {
+    if (!args || !args.className) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "className is required"
+      );
+    }
+
+    try {
+      const result = codeGenerator.generateActorComponent(
+        args.className as string,
+        args.module as string | undefined
+      );
+      
+      let responseText = `Generated ActorComponent class ${args.className}\n\n`;
+      
+      if (result.headerFile) {
+        responseText += `=== ${result.headerFile.filename} ===\n\`\`\`cpp\n${result.headerFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.sourceFile) {
+        responseText += `=== ${result.sourceFile.filename} ===\n\`\`\`cpp\n${result.sourceFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.instructions) {
+        responseText += `${result.instructions}`;
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: responseText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate ActorComponent: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_replication_code") {
+    if (!args || !args.className || !args.properties) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "className and properties are required"
+      );
+    }
+
+    try {
+      const options: ReplicationOptions = {
+        className: args.className as string,
+        properties: args.properties as any,
+        rpcs: args.rpcs as any,
+      };
+
+      const result = codeGenerator.generateReplicationCode(options);
+      
+      let responseText = `Generated replication code for ${args.className}\n\n`;
+      
+      if (result.additionalFiles) {
+        result.additionalFiles.forEach(file => {
+          responseText += `=== ${file.filename} ===\n${file.content}\n\n`;
+        });
+      }
+      
+      if (result.instructions) {
+        responseText += `${result.instructions}`;
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: responseText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate replication code: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_data_asset") {
+    if (!args || !args.className || !args.properties) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "className and properties are required"
+      );
+    }
+
+    try {
+      const options: DataAssetOptions = {
+        className: args.className as string,
+        module: args.module as string | undefined,
+        properties: args.properties as any,
+      };
+
+      const result = codeGenerator.generateDataAsset(options);
+      
+      let responseText = `Generated DataAsset class ${args.className}\n\n`;
+      
+      if (result.headerFile) {
+        responseText += `=== ${result.headerFile.filename} ===\n\`\`\`cpp\n${result.headerFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.sourceFile) {
+        responseText += `=== ${result.sourceFile.filename} ===\n\`\`\`cpp\n${result.sourceFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.instructions) {
+        responseText += `${result.instructions}`;
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: responseText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate DataAsset: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_data_table") {
+    if (!args || !args.structName || !args.properties) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "structName and properties are required"
+      );
+    }
+
+    try {
+      const options: DataTableRowOptions = {
+        structName: args.structName as string,
+        module: args.module as string | undefined,
+        properties: args.properties as any,
+      };
+
+      const result = codeGenerator.generateDataTableRow(options);
+      
+      let responseText = `Generated DataTable row structure ${args.structName}\n\n`;
+      
+      if (result.headerFile) {
+        responseText += `=== ${result.headerFile.filename} ===\n\`\`\`cpp\n${result.headerFile.content}\n\`\`\`\n\n`;
+      }
+      
+      if (result.instructions) {
+        responseText += `${result.instructions}`;
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: responseText,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate DataTable structure: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
   throw new McpError(

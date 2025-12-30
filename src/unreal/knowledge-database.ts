@@ -879,6 +879,134 @@ export const UnrealEngineKnowledge: Record<string, SystemCategory> = {
     ],
     version: '4.0',
     tags: ['materials', 'shaders', 'pbr', 'rendering']
+  },
+
+  'inventory-system': {
+    id: 'inventory-system',
+    name: 'Inventory & Crafting Systems',
+    description: 'Component-based inventory systems with item management, crafting, and multiplayer replication',
+    overview: 'Modern inventory systems in Unreal Engine use component-based architecture with ActorComponents for flexibility. Supports multiple inventory types (grid-based, slot-based, weight-based), item stacking, categories, crafting recipes, and robust multiplayer replication. Integration with Gameplay Ability System enables powerful item effects and equipment abilities.',
+    keyFeatures: [
+      {
+        name: 'Component-Based Architecture',
+        description: 'UInventoryComponent attached to any actor (player, NPC, chest, ship, station) for modular inventory management',
+        since: '5.0',
+        status: 'stable'
+      },
+      {
+        name: 'Multiple Inventory Types',
+        description: 'Grid-based (Diablo-style), slot-based (WoW-style), weight-based (Skyrim-style), or hybrid approaches',
+        status: 'stable'
+      },
+      {
+        name: 'Item Stacking and Categories',
+        description: 'Stackable items with max stack sizes, categorization, filtering, and sorting for organized inventory',
+        status: 'stable'
+      },
+      {
+        name: 'Gameplay Ability System Integration',
+        description: 'Item usage triggers GAS abilities, equipment grants passive effects, full multiplayer replication support',
+        since: '5.0',
+        status: 'stable'
+      },
+      {
+        name: 'Crafting System',
+        description: 'Recipe-based crafting with data tables, crafting stations, ingredient requirements, and queue management',
+        status: 'stable'
+      },
+      {
+        name: 'Multiplayer Replication',
+        description: 'Server-authoritative inventory with FastArraySerializer, RepNotify, and secure validation',
+        status: 'stable'
+      },
+      {
+        name: 'Drag and Drop UI',
+        description: 'UMG-based inventory UI with drag-drop operations, tooltips, and context menus',
+        status: 'stable'
+      },
+      {
+        name: 'Data-Driven Design',
+        description: 'Item definitions in data tables with soft asset references for performance and designer accessibility',
+        status: 'stable'
+      }
+    ],
+    bestPractices: [
+      {
+        title: 'Use Component Composition Over Inheritance',
+        description: 'Attach UInventoryComponent to actors instead of creating inventory-specific actor classes',
+        category: 'architecture'
+      },
+      {
+        title: 'Implement Layered Architecture',
+        description: 'Separate data layer (item definitions), system layer (subsystems), instance layer (components), and integration layer (GAS)',
+        category: 'architecture'
+      },
+      {
+        title: 'Server-Authoritative Replication',
+        description: 'All inventory changes validated and executed server-side, replicated to clients via RepNotify',
+        category: 'security'
+      },
+      {
+        title: 'Use Soft References for Assets',
+        description: 'Store item icons and meshes as TSoftObjectPtr to avoid loading all assets at once',
+        category: 'performance'
+      },
+      {
+        title: 'Integrate with Gameplay Ability System',
+        description: 'Use GAS for item abilities, equipment effects, and consumable actions for robust multiplayer support',
+        category: 'workflow'
+      },
+      {
+        title: 'Data Table Driven Items and Recipes',
+        description: 'Store all item data and crafting recipes in data tables for easy balancing and designer iteration',
+        category: 'workflow'
+      },
+      {
+        title: 'Use Gameplay Tags for Item Categories',
+        description: 'Leverage gameplay tags for flexible item categorization, filtering, and effect application',
+        category: 'workflow'
+      },
+      {
+        title: 'Optimize UI with Modular Widgets',
+        description: 'Create reusable UMG widgets for slots, items, and tooltips with efficient update patterns',
+        category: 'performance'
+      }
+    ],
+    relatedSystems: ['gameplay-ability-system', 'gameplay-framework', 'ui-system', 'networking-system'],
+    references: [
+      {
+        title: 'Building a Flexible Inventory System in UE5 with C++',
+        url: 'https://www.spongehammer.com/unreal-engine-5-inventory-system-cpp-guide/',
+        type: 'tutorial'
+      },
+      {
+        title: 'How to Create an Inventory System in Unreal Engine 5',
+        url: 'https://outscal.com/blog/how-to-create-an-inventory-system-in-unreal-engine-5',
+        type: 'tutorial'
+      },
+      {
+        title: 'Epic Community Inventory System Tutorial',
+        url: 'https://dev.epicgames.com/community/learning/tutorials/V2J9/unreal-engine-inventory-system',
+        type: 'tutorial'
+      },
+      {
+        title: 'Getting Started with ForgeKeep (Advanced Inventory Plugin)',
+        url: 'https://dev.epicgames.com/community/learning/tutorials/pBM0/unreal-engine-getting-started-with-forgekeep',
+        type: 'tutorial'
+      },
+      {
+        title: 'Creating Drag and Drop UI in Unreal Engine',
+        url: 'https://dev.epicgames.com/documentation/en-us/unreal-engine/creating-drag-and-drop-ui-in-unreal-engine',
+        type: 'official_docs'
+      },
+      {
+        title: 'Adastrea Inventory System Research',
+        url: 'https://github.com/Mittenzx/Adastrea-MCP/blob/main/INVENTORY_SYSTEM_RESEARCH.md',
+        type: 'article'
+      }
+    ],
+    version: '5.0',
+    tags: ['gameplay', 'inventory', 'crafting', 'items', 'ui', 'multiplayer', 'gas', 'components']
   }
 };
 

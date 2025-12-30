@@ -92,6 +92,16 @@ The pre-populated data combined with live repository access ensures AI agents ha
 - **Comprehensive Knowledge**: Built-in expertise in all major UE5.6+ systems
 - **Multi-Repository Deployment**: Can be rolled out across all your Unreal Engine repositories
 - **Reusable**: Works with any Unreal Engine project, not just Adastrea
+### Phase 3.1: AI-Enhanced Development Tools (✅ Completed)
+- **Intelligent Code Generation**: Generate UE-compliant C++ code following best practices
+- **Unreal-Aware Templates**: Create UClasses, Blueprints-compatible classes, common patterns
+- **GameMode Generation**: Generate GameMode classes with proper setup
+- **Character Generation**: Create Character classes with health system
+- **Component Generation**: Generate ActorComponent classes for reusable functionality
+- **Replication Code**: Generate network replication code for properties and RPCs
+- **Data Assets**: Create UDataAsset classes for configuration data
+- **Data Tables**: Generate USTRUCT row structures for Data Tables
+- **8 New Code Generation Tools**: Comprehensive code scaffolding for UE development
 
 ## Installation
 
@@ -506,6 +516,230 @@ Get systems related to a specific Unreal Engine system.
 }
 ```
 
+### Phase 3.1: Intelligent Code Generation Tools
+
+#### generate_uclass
+
+Generate a UClass following Unreal Engine conventions. Creates header and source files for a basic C++ class.
+
+**Parameters:**
+- `className` (string, required): Name of the class (e.g., 'AMyActor', 'UMyObject')
+- `parentClass` (string, optional): Parent class (e.g., 'AActor', 'UObject'). Default: 'UObject'
+- `module` (string, optional): Module name. Default: 'YourProject'
+- `blueprintType` (boolean, optional): Whether this class can be used as a Blueprint type
+- `blueprintable` (boolean, optional): Whether Blueprints can be derived from this class
+- `abstract` (boolean, optional): Whether this is an abstract class
+- `config` (string, optional): Config category (e.g., 'Game', 'Engine')
+
+**Example:**
+```json
+{
+  "className": "AMyCustomActor",
+  "parentClass": "AActor",
+  "module": "MyGame",
+  "blueprintable": true,
+  "blueprintType": true
+}
+```
+
+#### generate_blueprint_compatible_class
+
+Generate a Blueprint-compatible C++ class with properties and functions exposed to Blueprints.
+
+**Parameters:**
+- `className` (string, required): Name of the class
+- `parentClass` (string, optional): Parent class. Default: 'UObject'
+- `module` (string, optional): Module name. Default: 'YourProject'
+- `properties` (array, optional): Properties to expose to Blueprints
+- `functions` (array, optional): Functions to expose to Blueprints
+
+**Example:**
+```json
+{
+  "className": "UMyComponent",
+  "parentClass": "UActorComponent",
+  "module": "MyGame",
+  "properties": [
+    {
+      "name": "Speed",
+      "type": "float",
+      "category": "Movement",
+      "editAnywhere": true,
+      "blueprintReadWrite": true,
+      "defaultValue": "600.0f",
+      "tooltip": "Movement speed"
+    }
+  ],
+  "functions": [
+    {
+      "name": "GetSpeed",
+      "returnType": "float",
+      "category": "Movement",
+      "blueprintPure": true,
+      "isConst": true
+    }
+  ]
+}
+```
+
+#### generate_game_mode
+
+Generate a GameMode class following UE best practices.
+
+**Parameters:**
+- `className` (string, required): Name of the GameMode class (e.g., 'AMyGameMode')
+- `module` (string, optional): Module name. Default: 'YourProject'
+
+**Example:**
+```json
+{
+  "className": "AMyGameMode",
+  "module": "MyGame"
+}
+```
+
+#### generate_character_class
+
+Generate a Character class with health system and common functionality.
+
+**Parameters:**
+- `className` (string, required): Name of the Character class (e.g., 'AMyCharacter')
+- `module` (string, optional): Module name. Default: 'YourProject'
+
+**Example:**
+```json
+{
+  "className": "AMyCharacter",
+  "module": "MyGame"
+}
+```
+
+#### generate_actor_component
+
+Generate an ActorComponent class for reusable functionality.
+
+**Parameters:**
+- `className` (string, required): Name of the ActorComponent class (e.g., 'UMyComponent')
+- `module` (string, optional): Module name. Default: 'YourProject'
+
+**Example:**
+```json
+{
+  "className": "UHealthComponent",
+  "module": "MyGame"
+}
+```
+
+#### generate_replication_code
+
+Generate network replication code for properties and RPCs.
+
+**Parameters:**
+- `className` (string, required): Name of the class to add replication to
+- `properties` (array, required): Properties to replicate
+- `rpcs` (array, optional): Remote Procedure Calls to generate
+
+**Example:**
+```json
+{
+  "className": "AMyActor",
+  "properties": [
+    {
+      "name": "Health",
+      "type": "float",
+      "replicationType": "Replicated"
+    },
+    {
+      "name": "Score",
+      "type": "int32",
+      "replicationType": "ReplicatedUsing",
+      "repNotifyFunction": "OnRep_Score"
+    }
+  ],
+  "rpcs": [
+    {
+      "name": "ServerTakeDamage",
+      "type": "Server",
+      "reliable": true,
+      "parameters": [
+        { "name": "DamageAmount", "type": "float" }
+      ]
+    }
+  ]
+}
+```
+
+#### generate_data_asset
+
+Generate a UDataAsset class for storing configuration data.
+
+**Parameters:**
+- `className` (string, required): Name of the DataAsset class (e.g., 'UMyDataAsset')
+- `module` (string, optional): Module name. Default: 'YourProject'
+- `properties` (array, required): Properties for the data asset
+
+**Example:**
+```json
+{
+  "className": "UWeaponDataAsset",
+  "module": "MyGame",
+  "properties": [
+    {
+      "name": "WeaponName",
+      "type": "FString",
+      "category": "Weapon",
+      "editAnywhere": true,
+      "tooltip": "Display name of the weapon"
+    },
+    {
+      "name": "Damage",
+      "type": "float",
+      "category": "Stats",
+      "editAnywhere": true,
+      "defaultValue": "10.0f",
+      "tooltip": "Base damage"
+    }
+  ]
+}
+```
+
+#### generate_data_table
+
+Generate a USTRUCT for use as a DataTable row structure.
+
+**Parameters:**
+- `structName` (string, required): Name of the struct (e.g., 'FMyTableRow')
+- `module` (string, optional): Module name. Default: 'YourProject'
+- `properties` (array, required): Properties for the data table row
+
+**Example:**
+```json
+{
+  "structName": "FWeaponTableRow",
+  "module": "MyGame",
+  "properties": [
+    {
+      "name": "WeaponID",
+      "type": "int32",
+      "editAnywhere": true,
+      "tooltip": "Unique weapon identifier"
+    },
+    {
+      "name": "WeaponName",
+      "type": "FString",
+      "editAnywhere": true,
+      "tooltip": "Display name"
+    },
+    {
+      "name": "Damage",
+      "type": "float",
+      "editAnywhere": true,
+      "tooltip": "Base damage"
+    }
+  ]
+}
+```
+
 ## Example Workflows
 
 ### Basic Project Information
@@ -694,6 +928,103 @@ Get systems related to a specific Unreal Engine system.
    Use get_related_ue_systems with:
    - systemId: "animation-system"
    Returns related systems like gameplay-framework and metahuman-system
+   ```
+
+### Intelligent Code Generation (Phase 3.1)
+
+1. **Generate a Basic Actor Class:**
+   ```
+   Use generate_uclass with:
+   - className: "AMyPickupActor"
+   - parentClass: "AActor"
+   - module: "MyGame"
+   - blueprintable: true
+   - blueprintType: true
+   Creates header and source files with proper UE conventions
+   ```
+
+2. **Generate a Blueprint-Compatible Component:**
+   ```
+   Use generate_blueprint_compatible_class with:
+   - className: "UHealthComponent"
+   - parentClass: "UActorComponent"
+   - module: "MyGame"
+   - properties: [
+       { name: "MaxHealth", type: "float", category: "Health", 
+         editAnywhere: true, blueprintReadWrite: true, defaultValue: "100.0f" },
+       { name: "CurrentHealth", type: "float", category: "Health", 
+         blueprintReadOnly: true }
+     ]
+   - functions: [
+       { name: "TakeDamage", returnType: "void", 
+         parameters: [{ name: "Amount", type: "float" }],
+         category: "Health", blueprintCallable: true }
+     ]
+   Creates a fully Blueprint-integrated component
+   ```
+
+3. **Generate Common Pattern Classes:**
+   ```
+   # Generate a GameMode
+   Use generate_game_mode with:
+   - className: "AMyGameMode"
+   - module: "MyGame"
+   
+   # Generate a Character with health system
+   Use generate_character_class with:
+   - className: "APlayerCharacter"
+   - module: "MyGame"
+   
+   # Generate an ActorComponent
+   Use generate_actor_component with:
+   - className: "UInventoryComponent"
+   - module: "MyGame"
+   ```
+
+4. **Add Network Replication:**
+   ```
+   Use generate_replication_code with:
+   - className: "AMyActor"
+   - properties: [
+       { name: "Health", type: "float", replicationType: "Replicated" },
+       { name: "Score", type: "int32", replicationType: "ReplicatedUsing",
+         repNotifyFunction: "OnRep_Score" }
+     ]
+   - rpcs: [
+       { name: "ServerDoAction", type: "Server", reliable: true,
+         parameters: [{ name: "ActionID", type: "int32" }] }
+     ]
+   Generates GetLifetimeReplicatedProps and RPC implementations
+   ```
+
+5. **Create Data Assets:**
+   ```
+   Use generate_data_asset with:
+   - className: "UWeaponDataAsset"
+   - module: "MyGame"
+   - properties: [
+       { name: "WeaponName", type: "FString", category: "Weapon" },
+       { name: "Damage", type: "float", category: "Stats", 
+         defaultValue: "10.0f" },
+       { name: "FireRate", type: "float", category: "Stats",
+         defaultValue: "0.1f" }
+     ]
+   Creates a data asset class for configuration
+   ```
+
+6. **Generate Data Table Structures:**
+   ```
+   Use generate_data_table with:
+   - structName: "FWeaponTableRow"
+   - module: "MyGame"
+   - properties: [
+       { name: "WeaponID", type: "int32", tooltip: "Unique ID" },
+       { name: "WeaponName", type: "FString", tooltip: "Display name" },
+       { name: "Damage", type: "float", tooltip: "Base damage" },
+       { name: "WeaponMesh", type: "TSoftObjectPtr<UStaticMesh>",
+         tooltip: "3D mesh asset" }
+     ]
+   Creates a struct for use in Data Tables
    ```
 
 ## Data Storage
