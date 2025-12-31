@@ -9,6 +9,130 @@
 
 ---
 
+## 🎯 TODO - What's Not Done Yet
+
+### 🔥 Immediate Priority (Phase 3.2 & 3.3)
+**Next logical steps after completing Phase 3.1**
+
+#### Documentation & Context System (Phase 3.2)
+- [ ] **Smart Documentation Generation**
+  - Auto-generate documentation from code and Blueprints
+  - Extract comments and metadata
+  - Create system diagrams
+  - Generate integration guides
+
+- [ ] **Pattern Recognition & Recommendations**
+  - Detect common UE design patterns in use
+  - Suggest best practices based on Epic's guidelines
+  - Identify anti-patterns and performance issues
+  - Recommend plugin alternatives
+
+#### Testing & Quality Assurance (Phase 3.3)
+- [ ] **Test Management Integration**
+  - Resource: `unreal://tests/functional` - List all functional tests
+  - Tool: `run_unreal_tests` - Execute test suites
+  - Tool: `create_test_case` - Generate new test scaffolding
+  - Integration with existing Python automation (SmokeTest.py, etc.)
+
+- [ ] **Performance Profiling Support**
+  - Parse Unreal Insights data
+  - Identify performance bottlenecks
+  - Suggest optimization opportunities
+  - Track performance metrics over time
+
+#### Smart Refactoring Tools (Phase 3.1 continuation)
+- [ ] Tool: `convert_blueprint_to_cpp` - Assist in Blueprint nativization
+- [ ] Tool: `extract_interface` - Create Blueprint/C++ interfaces
+- [ ] Tool: `refactor_to_component` - Extract functionality to components
+
+---
+
+### 📅 Near-term Priority (Phase 4 - Q4 2026)
+**Advanced Features & Ecosystem**
+
+#### Multi-Project Support (Phase 4.1)
+- [ ] **Project Workspace Management**
+  - Manage multiple UE projects simultaneously
+  - Share common resources across projects
+  - Project templates and archetypes
+  - Cross-project asset references
+
+- [ ] **Team Collaboration Features**
+  - Multi-user project state
+  - Change tracking and conflict detection
+  - Integration with version control (Git, Perforce)
+  - Code review assistance
+
+#### Marketplace & Plugin Ecosystem (Phase 4.2)
+- [ ] **Plugin Discovery & Management**
+  - Search Unreal Marketplace from MCP
+  - Plugin installation automation
+  - Plugin compatibility checking
+  - Custom plugin registry
+
+- [ ] **Asset Store Integration**
+  - Browse marketplace assets
+  - Asset import automation
+  - License tracking
+  - Asset update notifications
+
+#### CI/CD Integration (Phase 4.3)
+- [ ] **Build Pipeline Integration**
+  - Trigger automated builds
+  - Monitor build status
+  - Parse build logs and errors
+  - Deployment automation
+
+- [ ] **Cloud Build Support**
+  - Integration with cloud build services
+  - Distributed cooking and packaging
+  - Remote testing infrastructure
+
+---
+
+### 🔮 Long-term Priority (Phase 5 - Q1 2027)
+**Intelligence & Automation**
+
+#### Semantic Code Understanding (Phase 5.1)
+- [ ] **Natural Language Code Search**
+  - Search code by functionality, not just text
+  - Understand code intent and purpose
+  - Find similar implementations
+  - Suggest code reuse opportunities
+
+- [ ] **Smart Migration Assistant**
+  - Assist with engine version upgrades
+  - Deprecated API detection and replacement
+  - Breaking change identification
+  - Migration guide generation
+
+#### Predictive Development Assistance (Phase 5.2)
+- [ ] **Context-Aware Suggestions**
+  - Predict next development steps
+  - Suggest related systems to implement
+  - Proactive debugging assistance
+  - Performance optimization recommendations
+
+- [ ] **Automated Bug Detection**
+  - Static analysis integration
+  - Common bug pattern detection
+  - Memory leak identification
+  - Thread safety analysis
+
+#### Game Design Intelligence (Phase 5.3)
+- [ ] **System Architecture Analysis**
+  - Visualize game system dependencies
+  - Identify coupling and cohesion issues
+  - Suggest architectural improvements
+  - Generate architecture documentation
+
+- [ ] **Data-Driven Development Support**
+  - Data asset generation from descriptions
+  - Data table population assistance
+  - Balance and tuning recommendations
+
+---
+
 ## Current State (v1.0.0)
 
 ### ✅ Implemented Features
@@ -26,6 +150,36 @@
   - Blueprint metadata extraction
   - Asset management and categorization
   - Plugin and module registry
+- **Phase 2.1 (✅ Completed):** Editor Communication Layer
+  - Adastrea-Director integration for live UE Editor state
+  - Console command execution via MCP
+  - Python script execution in UE Editor
+  - Live asset management with graceful fallback
+- **Phase 2.2 (✅ Completed):** Blueprint Interaction Tools
+  - Deep Blueprint inspection and structure analysis
+  - Blueprint node search capabilities
+  - Blueprint modification tools (variables, functions, properties)
+  - Component and graph analysis
+- **Phase 2.3 (✅ Completed):** Actor & Component System
+  - Level actor registry and search
+  - Actor spawning and modification
+  - Component hierarchy inspection
+  - Actor template management (create, list, instantiate, delete)
+- **Phase 3.1 (✅ Completed):** Intelligent Code Generation
+  - 8 code generation tools for UE development
+  - UClass, GameMode, Character, Component generation
+  - Network replication code generation
+  - Data asset and data table creation
+- **UE5.6+ Knowledge Database (✅ Completed):**
+  - Comprehensive information on 12+ core UE5.6+ systems
+  - Searchable knowledge with tags and metadata
+  - Best practices and official references
+  - 3 new knowledge resources, 4 new query tools
+- **GitHub Copilot Agent (✨ Completed):**
+  - Pre-configured UE5.6+ development agent
+  - Epic Games coding standards enforcement
+  - Full MCP tool integration
+  - Multi-repository deployment support
 
 ### 🎯 Current Capabilities
 - Store and retrieve game project information
@@ -39,16 +193,43 @@
   - Extract Blueprint metadata and class hierarchies
   - Manage and categorize assets (Meshes, Materials, Textures, etc.)
   - Track plugins and modules with dependencies
+- **Live Editor Integration (via Adastrea-Director):**
+  - Real-time UE Editor state access
+  - Console command execution
+  - Python code execution in UE Editor
+  - Live asset list with fallback to local cache
+- **Blueprint Development:**
+  - Deep inspection of Blueprint structure, variables, functions
+  - Search for specific Blueprint nodes
+  - Modify Blueprint properties and add variables/functions
+  - Analyze component hierarchies and graphs
+- **Actor & Level Management:**
+  - List and search actors in current level
+  - Spawn new actors with full configuration
+  - Modify actor properties, transforms, and tags
+  - Create and manage reusable actor templates
+- **Intelligent Code Generation:**
+  - Generate UE-compliant C++ code following Epic standards
+  - Create UClasses, GameModes, Characters, Components
+  - Generate network replication code
+  - Create data assets and data table structures
+- **UE5.6+ Knowledge Base:**
+  - Query detailed information on core UE systems
+  - Access best practices and implementation guides
+  - Search by keywords, tags, or system IDs
+  - Discover related systems and dependencies
 - Static code analysis and project structure validation
 - Asset categorization and search capabilities
 
 ### ⚠️ Current Limitations
-- No direct Unreal Engine integration (Adastrea-Director provides this)
-- Static analysis only (no live code analysis or real-time editor integration yet)
-- No real-time project inspection (Phase 2 addresses this via Adastrea-Director)
-- Limited Blueprint analysis (metadata only, not full node graph parsing)
+- Limited to features available in Adastrea-Director for live editor integration
+- Some Phase 2 Blueprint features require UE Editor to be running
+- Actor spawning and modification require Adastrea-Director connection
+- No automated testing infrastructure yet (Phase 3.3)
+- No multi-project workspace support yet (Phase 4.1)
+- No marketplace integration yet (Phase 4.2)
 
-> **Note:** Adastrea-MCP focuses on static analysis and project metadata. For live Unreal Engine editor integration, see [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director).
+> **Note:** Adastrea-MCP provides both static analysis (works offline) and live editor integration (via Adastrea-Director). For standalone runtime integration, see [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director).
 
 ---
 
@@ -634,19 +815,20 @@ Together, they form a complete development ecosystem where:
 - ✅ < 2 second response time for all resources - **ACHIEVED**
 - ✅ 95%+ accuracy in code analysis - **ACHIEVED**
 
-### Phase 2 Success Criteria
-- ✅ Bidirectional UE Editor communication
-- ✅ Real-time asset registry updates
-- ✅ Execute 20+ editor commands
-- ✅ Open and modify assets programmatically
-- ✅ Full Blueprint inspection capability
+### Phase 2 Success Criteria ✅
+- ✅ Bidirectional UE Editor communication - **ACHIEVED**
+- ✅ Real-time asset registry updates - **ACHIEVED**
+- ✅ Execute 20+ editor commands - **ACHIEVED**
+- ✅ Open and modify assets programmatically - **ACHIEVED**
+- ✅ Full Blueprint inspection capability - **ACHIEVED**
 
-### Phase 3 Success Criteria
-- ✅ Generate UE-compliant code with 100% compile success
-- ✅ Detect 50+ common UE patterns
-- ✅ Automated test execution and reporting
-- ✅ Performance bottleneck identification
-- ✅ 90%+ developer satisfaction
+### Phase 3 Success Criteria (Partial ✅)
+- ✅ Generate UE-compliant code with 100% compile success - **ACHIEVED (Phase 3.1)**
+- ✅ 8 intelligent code generation tools implemented - **ACHIEVED (Phase 3.1)**
+- ⏳ Detect 50+ common UE patterns - **IN PROGRESS**
+- ⏳ Automated test execution and reporting - **PLANNED (Phase 3.3)**
+- ⏳ Performance bottleneck identification - **PLANNED (Phase 3.3)**
+- ⏳ Smart refactoring tools - **PLANNED (Phase 3.1 continuation)**
 
 ### Phase 4 Success Criteria
 - ✅ Support 100+ concurrent projects
