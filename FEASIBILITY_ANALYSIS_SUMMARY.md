@@ -116,7 +116,7 @@ Week 2: Testing + Documentation
 ```
 MCP Client
     ↓
-Node.js MCP Server (Primary Process)
+Node.js MCP server (Primary Process)
     ├─ Static Analysis Layer (TypeScript - from Adastrea-MCP)
     └─ IPC Bridge
          ↓

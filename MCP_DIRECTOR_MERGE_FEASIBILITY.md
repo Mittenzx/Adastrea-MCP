@@ -114,24 +114,24 @@ This document analyzes the feasibility of merging the Adastrea-MCP server into t
 - **RAG System**: ChromaDB for document understanding
 - **LLM Integration**: LangChain + Google Gemini
 - **Task Planning**: Autonomous task decomposition
-- **MCP Server**: Exists but needs REST API implementation
+- **MCP server**: Exists but needs REST API implementation
 
 **Future Architecture** (Native Plugin):
 - **UE C++ Plugin**: Editor integration
 - **Python Subprocess**: Reuses 95% existing code
 - **Slate UI**: Docked panel in editor
 - **IPC**: Local sockets
-- **MCP Server**: Remote execution, asset management
+- **MCP server**: Remote execution, asset management
 - **RAG System**: Document understanding
 - **Autonomous Agents**: Performance, bug detection, quality
 
 ### 1.3 Current Integration Status
 
-**Phase 2.1 Implementation**: ✅ Complete (Infrastructure)
+**Phase 2.1 Implementation**: ✅ Complete (Infrastructure Layer - Not Yet Functional)
 
-The integration layer between Adastrea-MCP and Adastrea-Director is **fully implemented** with:
+The integration infrastructure between Adastrea-MCP and Adastrea-Director is **fully implemented** but not yet connected to a live backend:
 
-✅ **Completed Components**:
+✅ **Completed Infrastructure Components**:
 - DirectorClient class with type-safe API
 - EditorBridge coordination logic
 - 4 new MCP tools for live editor interaction
@@ -147,7 +147,7 @@ The integration layer between Adastrea-MCP and Adastrea-Director is **fully impl
 - Live data communication
 - End-to-end testing with running Director
 
-**Current Limitation**: DirectorClient uses placeholder implementations that return "disconnected" status. The infrastructure is complete but awaits REST API endpoints in Adastrea-Director.
+**Current Status**: The infrastructure layer is complete and ready for integration, but DirectorClient uses placeholder implementations that return "disconnected" status until REST API endpoints are implemented in Adastrea-Director.
 
 **Key Quote from INTEGRATION_NOTES.md**:
 > "Even without live Director connection, the implementation provides:
@@ -171,7 +171,7 @@ The integration layer between Adastrea-MCP and Adastrea-Director is **fully impl
              ├──────────────────────────────────────────────┐
              │                                              │
     ┌────────▼────────────┐                    ┌───────────▼──────────┐
-    │ Adastrea-MCP Server │                    │ Adastrea-Director    │
+    │ Adastrea-MCP server │                    │ Adastrea-Director    │
     │ (Node.js/TypeScript)│                    │ (Python)             │
     │                     │                    │                      │
     │ • Static Analysis   │◄───REST/HTTP───────┤ • RAG System         │
@@ -181,7 +181,7 @@ The integration layer between Adastrea-MCP and Adastrea-Director is **fully impl
     │ • Director Client   │                    │ Future:              │
     │   (awaiting API)    │                    │ • UE C++ Plugin      │
     └─────────────────────┘                    │ • Python Subprocess  │
-                                               │ • MCP Server         │
+                                               │ • MCP server         │
                                                │ • Autonomous Agents  │
                                                └──────────┬───────────┘
                                                           │
@@ -208,11 +208,11 @@ The integration layer between Adastrea-MCP and Adastrea-Director is **fully impl
              │ MCP Protocol (stdio)
              │
     ┌────────▼────────────────────────────────────────────────┐
-    │ Unified Adastrea-Director MCP Server                    │
+    │ Unified Adastrea-Director MCP server                    │
     │ (Node.js/TypeScript + Python Backend)                   │
     │                                                          │
     │ ┌──────────────────────────────────────────────────┐    │
-    │ │ MCP Server Layer (TypeScript)                    │    │
+    │ │ MCP server layer (TypeScript)                    │    │
     │ │ • 37 MCP Tools                                   │    │
     │ │ • 13 MCP Resources                               │    │
     │ │ • Protocol handling                              │    │
@@ -814,7 +814,7 @@ The integration layer between Adastrea-MCP and Adastrea-Director is **fully impl
 
 **Action**:
 - Merge Adastrea-MCP code into Adastrea-Director repo
-- Rename to "Adastrea Director" (drop "Director" if needed)
+- Keep "Adastrea-Director" as the project name (or rename to "Adastrea" if a shorter name is preferred)
 - Update branding to emphasize unified capabilities
 
 #### Recommendation 2: Implement Minimum Viable Integration First
@@ -1038,7 +1038,7 @@ src/
 **Proposed Merged Structure**:
 ```
 adastrea-director/
-├── mcp/                    # TypeScript MCP Server
+├── mcp/                    # TypeScript MCP server
 │   ├── src/
 │   │   ├── server.ts       # Main MCP server (from index.ts)
 │   │   ├── storage.ts      # Project metadata
@@ -1087,7 +1087,7 @@ interface IPCMessage {
 
 **Communication Flow**:
 ```
-MCP Server (TypeScript)          Python Backend
+MCP server (TypeScript)          Python Backend
        │                                │
        ├──── request: rag_query ────────>
        │          (params: {query})      │
