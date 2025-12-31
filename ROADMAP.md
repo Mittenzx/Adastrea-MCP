@@ -9,6 +9,130 @@
 
 ---
 
+## 🎯 TODO - What's Not Done Yet
+
+### 🔥 Immediate Priority (Phase 3.2 & 3.3)
+**Next logical steps after completing Phase 3.1**
+
+#### Documentation & Context System (Phase 3.2)
+- [ ] **Smart Documentation Generation**
+  - Auto-generate documentation from code and Blueprints
+  - Extract comments and metadata
+  - Create system diagrams
+  - Generate integration guides
+
+- [ ] **Pattern Recognition & Recommendations**
+  - Detect common UE design patterns in use
+  - Suggest best practices based on Epic's guidelines
+  - Identify anti-patterns and performance issues
+  - Recommend plugin alternatives
+
+#### Testing & Quality Assurance (Phase 3.3)
+- [ ] **Test Management Integration**
+  - Resource: `unreal://tests/functional` - List all functional tests
+  - Tool: `run_unreal_tests` - Execute test suites
+  - Tool: `create_test_case` - Generate new test scaffolding
+  - Integration with existing Python automation (SmokeTest.py, etc.)
+
+- [ ] **Performance Profiling Support**
+  - Parse Unreal Insights data
+  - Identify performance bottlenecks
+  - Suggest optimization opportunities
+  - Track performance metrics over time
+
+#### Smart Refactoring Tools (Phase 3.1 continuation)
+- [ ] Tool: `convert_blueprint_to_cpp` - Assist in Blueprint nativization
+- [ ] Tool: `extract_interface` - Create Blueprint/C++ interfaces
+- [ ] Tool: `refactor_to_component` - Extract functionality to components
+
+---
+
+### 📅 Near-term Priority (Phase 4 - Q4 2026)
+**Advanced Features & Ecosystem**
+
+#### Multi-Project Support (Phase 4.1)
+- [ ] **Project Workspace Management**
+  - Manage multiple UE projects simultaneously
+  - Share common resources across projects
+  - Project templates and archetypes
+  - Cross-project asset references
+
+- [ ] **Team Collaboration Features**
+  - Multi-user project state
+  - Change tracking and conflict detection
+  - Integration with version control (Git, Perforce)
+  - Code review assistance
+
+#### Marketplace & Plugin Ecosystem (Phase 4.2)
+- [ ] **Plugin Discovery & Management**
+  - Search Unreal Marketplace from MCP
+  - Plugin installation automation
+  - Plugin compatibility checking
+  - Custom plugin registry
+
+- [ ] **Asset Store Integration**
+  - Browse marketplace assets
+  - Asset import automation
+  - License tracking
+  - Asset update notifications
+
+#### CI/CD Integration (Phase 4.3)
+- [ ] **Build Pipeline Integration**
+  - Trigger automated builds
+  - Monitor build status
+  - Parse build logs and errors
+  - Deployment automation
+
+- [ ] **Cloud Build Support**
+  - Integration with cloud build services
+  - Distributed cooking and packaging
+  - Remote testing infrastructure
+
+---
+
+### 🔮 Long-term Priority (Phase 5 - Q1 2027)
+**Intelligence & Automation**
+
+#### Semantic Code Understanding (Phase 5.1)
+- [ ] **Natural Language Code Search**
+  - Search code by functionality, not just text
+  - Understand code intent and purpose
+  - Find similar implementations
+  - Suggest code reuse opportunities
+
+- [ ] **Smart Migration Assistant**
+  - Assist with engine version upgrades
+  - Deprecated API detection and replacement
+  - Breaking change identification
+  - Migration guide generation
+
+#### Predictive Development Assistance (Phase 5.2)
+- [ ] **Context-Aware Suggestions**
+  - Predict next development steps
+  - Suggest related systems to implement
+  - Proactive debugging assistance
+  - Performance optimization recommendations
+
+- [ ] **Automated Bug Detection**
+  - Static analysis integration
+  - Common bug pattern detection
+  - Memory leak identification
+  - Thread safety analysis
+
+#### Game Design Intelligence (Phase 5.3)
+- [ ] **System Architecture Analysis**
+  - Visualize game system dependencies
+  - Identify coupling and cohesion issues
+  - Suggest architectural improvements
+  - Generate architecture documentation
+
+- [ ] **Data-Driven Development Support**
+  - Data asset generation from descriptions
+  - Data table population assistance
+  - Balance and tuning recommendations
+
+---
+
 ## Current State (v1.0.0)
 
 ### ✅ Implemented Features
