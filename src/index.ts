@@ -51,6 +51,13 @@ import {
   type DataAssetOptions,
   type DataTableRowOptions
 } from "./unreal/code-generator.js";
+import {
+  createDocGenerator,
+  type DocGenerationOptions,
+  type DiagramOptions,
+  type IntegrationGuideOptions,
+  type CodeMetadata,
+} from "./unreal/doc-generator.js";
 
 // Initialize storage for game project metadata
 const storage = new GameProjectStorage();
@@ -314,6 +321,12 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
       name: "UE5.6+ Knowledge Tags",
       description: "All available tags for categorizing and searching UE5.6+ systems",
       mimeType: "application/json",
+    },
+    {
+      uri: "unreal://docs/systems",
+      name: "Generated Documentation",
+      description: "Auto-generated documentation from code and Blueprints with detailed API information",
+      mimeType: "text/markdown",
     }
   );
 
@@ -519,6 +532,36 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
           uri,
           mimeType: "application/json",
           text: JSON.stringify({ tags }, null, 2),
+        },
+      ],
+    };
+  }
+
+  if (uri === "unreal://docs/systems") {
+    // Return information about the documentation generation capability
+    const info = {
+      description: "Auto-generated documentation from code and Blueprints",
+      usage: "Use the 'generate_documentation' tool to generate documentation from specific C++ files",
+      features: [
+        "Extract comments and metadata from C++ code",
+        "Extract Blueprint variable and function information",
+        "Generate comprehensive markdown documentation",
+        "Create system architecture diagrams",
+        "Generate integration guides",
+      ],
+      tools: [
+        "generate_documentation - Generate docs from a C++ file",
+        "extract_code_metadata - Extract detailed metadata from code",
+        "generate_system_diagram - Create Mermaid architecture diagrams",
+        "generate_integration_guide - Create integration guides for systems",
+      ],
+    };
+    return {
+      contents: [
+        {
+          uri,
+          mimeType: "text/markdown",
+          text: `# Auto-Generated Documentation System\n\n${info.description}\n\n## Features\n\n${info.features.map(f => `- ${f}`).join('\n')}\n\n## Available Tools\n\n${info.tools.map(t => `- ${t}`).join('\n')}\n\n## Usage\n\n${info.usage}`,
         },
       ],
     };
@@ -1548,6 +1591,105 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ["structName", "properties"],
+        },
+      },
+      {
+        name: "generate_documentation",
+        description: "Auto-generate comprehensive documentation from C++ code including comments, metadata, classes, functions, and properties. Creates markdown documentation with detailed API information.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            file_path: {
+              type: "string",
+              description: "Absolute path to the C++ header file (.h) to generate documentation for",
+            },
+            title: {
+              type: "string",
+              description: "Title for the generated documentation. Default: 'Unreal Engine Documentation'",
+            },
+            includePrivate: {
+              type: "boolean",
+              description: "Include private members in documentation. Default: false",
+            },
+          },
+          required: ["file_path"],
+        },
+      },
+      {
+        name: "extract_code_metadata",
+        description: "Extract detailed metadata from C++ code including classes, functions, properties, enums, structs with their comments and specifiers. Useful for analysis and custom documentation generation.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            file_path: {
+              type: "string",
+              description: "Absolute path to the C++ file to analyze",
+            },
+          },
+          required: ["file_path"],
+        },
+      },
+      {
+        name: "generate_system_diagram",
+        description: "Create a system architecture diagram in Mermaid format showing class relationships, inheritance, and dependencies. The diagram can be rendered in markdown viewers.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            file_paths: {
+              type: "array",
+              description: "Array of absolute paths to C++ header files to include in the diagram",
+              items: {
+                type: "string",
+              },
+            },
+            includeInheritance: {
+              type: "boolean",
+              description: "Include inheritance relationships. Default: true",
+            },
+            includeDependencies: {
+              type: "boolean",
+              description: "Include dependency relationships. Default: false",
+            },
+            maxDepth: {
+              type: "number",
+              description: "Maximum depth for relationships. Default: 3",
+            },
+          },
+          required: ["file_paths"],
+        },
+      },
+      {
+        name: "generate_integration_guide",
+        description: "Generate a comprehensive integration guide for a system showing how to integrate it into an Unreal Engine project with setup steps, code examples, and best practices.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            system_name: {
+              type: "string",
+              description: "Name of the system (e.g., 'Inventory System', 'Combat System')",
+            },
+            file_paths: {
+              type: "array",
+              description: "Array of absolute paths to C++ header files that make up the system",
+              items: {
+                type: "string",
+              },
+            },
+            targetAudience: {
+              type: "string",
+              description: "Target audience level: 'beginner', 'intermediate', or 'advanced'. Default: 'intermediate'",
+              enum: ["beginner", "intermediate", "advanced"],
+            },
+            includeCodeExamples: {
+              type: "boolean",
+              description: "Include C++ code examples. Default: true",
+            },
+            includeBlueprints: {
+              type: "boolean",
+              description: "Include Blueprint integration information. Default: true",
+            },
+          },
+          required: ["system_name", "file_paths"],
         },
       },
     ],
@@ -2836,6 +2978,191 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       throw new McpError(
         ErrorCode.InternalError,
         `Failed to generate DataTable structure: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_documentation") {
+    if (!args || !args.file_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "file_path is required"
+      );
+    }
+
+    try {
+      const filePath = args.file_path as string;
+      const title = args.title as string | undefined;
+      const includePrivate = args.includePrivate as boolean | undefined;
+
+      // Create doc generator (we'll use a temporary path, but the file_path is what matters)
+      const docGen = createDocGenerator(filePath);
+      
+      // Extract metadata from the file
+      const metadata = await docGen.extractCodeMetadata(filePath);
+      
+      // Generate documentation
+      const options: DocGenerationOptions = {
+        title,
+        includePrivate,
+      };
+      
+      const result = await docGen.generateDocumentation(metadata, options);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.content,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate documentation: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "extract_code_metadata") {
+    if (!args || !args.file_path) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "file_path is required"
+      );
+    }
+
+    try {
+      const filePath = args.file_path as string;
+      
+      // Create doc generator
+      const docGen = createDocGenerator(filePath);
+      
+      // Extract metadata from the file
+      const metadata = await docGen.extractCodeMetadata(filePath);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(metadata, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to extract code metadata: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_system_diagram") {
+    if (!args || !args.file_paths || !Array.isArray(args.file_paths)) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "file_paths array is required"
+      );
+    }
+
+    try {
+      const filePaths = args.file_paths as string[];
+      const includeInheritance = args.includeInheritance !== false;
+      const includeDependencies = args.includeDependencies as boolean | undefined;
+      const maxDepth = args.maxDepth as number | undefined;
+      
+      // Extract metadata from all files
+      const allClasses: any[] = [];
+      for (const filePath of filePaths) {
+        const docGen = createDocGenerator(filePath);
+        const metadata = await docGen.extractCodeMetadata(filePath);
+        allClasses.push(...metadata.classes);
+      }
+      
+      // Generate diagram using the first file's doc generator
+      const docGen = createDocGenerator(filePaths[0]);
+      const options: DiagramOptions = {
+        includeInheritance,
+        includeDependencies,
+        maxDepth,
+      };
+      
+      const diagram = docGen.generateSystemDiagram(allClasses, options);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `# System Architecture Diagram\n\n${diagram}\n\n*Generated on ${new Date().toISOString()}*`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate system diagram: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  if (name === "generate_integration_guide") {
+    if (!args || !args.system_name || !args.file_paths || !Array.isArray(args.file_paths)) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "system_name and file_paths are required"
+      );
+    }
+
+    try {
+      const systemName = args.system_name as string;
+      const filePaths = args.file_paths as string[];
+      const targetAudience = (args.targetAudience as 'beginner' | 'intermediate' | 'advanced') || 'intermediate';
+      const includeCodeExamples = args.includeCodeExamples !== false;
+      const includeBlueprints = args.includeBlueprints !== false;
+      
+      // Extract metadata from all files
+      const allMetadata: CodeMetadata = {
+        classes: [],
+        functions: [],
+        properties: [],
+        enums: [],
+        structs: [],
+      };
+      
+      for (const filePath of filePaths) {
+        const docGen = createDocGenerator(filePath);
+        const metadata = await docGen.extractCodeMetadata(filePath);
+        allMetadata.classes.push(...metadata.classes);
+        allMetadata.functions.push(...metadata.functions);
+        allMetadata.properties.push(...metadata.properties);
+        allMetadata.enums.push(...metadata.enums);
+        allMetadata.structs.push(...metadata.structs);
+      }
+      
+      // Generate integration guide
+      const docGen = createDocGenerator(filePaths[0]);
+      const options: IntegrationGuideOptions = {
+        systemName,
+        targetAudience,
+        includeCodeExamples,
+        includeBlueprints,
+      };
+      
+      const result = await docGen.generateIntegrationGuide(systemName, allMetadata, options);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.content,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to generate integration guide: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }
