@@ -57,6 +57,7 @@ import {
   type DiagramOptions,
   type IntegrationGuideOptions,
   type CodeMetadata,
+  type ClassMetadata,
 } from "./unreal/doc-generator.js";
 
 // Initialize storage for game project metadata
@@ -3077,16 +3078,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const maxDepth = args.maxDepth as number | undefined;
       const maxItemsPerClass = args.maxItemsPerClass as number | undefined;
       
-      // Extract metadata from all files
-      const allClasses: any[] = [];
+      // Extract metadata from all files using a single doc generator instance
+      const docGen = createDocGenerator(filePaths[0]);
+      const allClasses: ClassMetadata[] = [];
       for (const filePath of filePaths) {
-        const docGen = createDocGenerator(filePath);
         const metadata = await docGen.extractCodeMetadata(filePath);
         allClasses.push(...metadata.classes);
       }
       
-      // Generate diagram using the first file's doc generator
-      const docGen = createDocGenerator(filePaths[0]);
+      // Generate diagram
       const options: DiagramOptions = {
         includeInheritance,
         includeDependencies,
@@ -3127,7 +3127,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const includeCodeExamples = args.includeCodeExamples !== false;
       const includeBlueprints = args.includeBlueprints !== false;
       
-      // Extract metadata from all files
+      // Extract metadata from all files using a single doc generator instance
+      const docGen = createDocGenerator(filePaths[0]);
       const allMetadata: CodeMetadata = {
         classes: [],
         functions: [],
@@ -3137,7 +3138,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
       
       for (const filePath of filePaths) {
-        const docGen = createDocGenerator(filePath);
         const metadata = await docGen.extractCodeMetadata(filePath);
         allMetadata.classes.push(...metadata.classes);
         allMetadata.functions.push(...metadata.functions);
@@ -3147,7 +3147,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
       
       // Generate integration guide
-      const docGen = createDocGenerator(filePaths[0]);
       const options: IntegrationGuideOptions = {
         systemName,
         targetAudience,

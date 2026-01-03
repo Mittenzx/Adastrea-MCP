@@ -11,11 +11,7 @@
  */
 
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import {
-	UnrealClass,
-	UnrealFunction,
-	BlueprintAsset,
 	DetailedBlueprintInfo,
 } from './types.js';
 
@@ -397,9 +393,15 @@ export class UnrealDocGenerator {
 				break;
 			}
 
+			// Skip empty lines, comments, and UMETA lines
+			if (!line || line.startsWith('//') || line.startsWith('/*') || line.startsWith('*') || line.startsWith('UMETA')) {
+				continue;
+			}
+
 			// Match enum value (e.g., "Value1 = 0," or "Value2,")
-			const valueMatch = line.match(/(\w+)(?:\s*=\s*(\d+))?\s*,?/);
-			if (valueMatch && !line.startsWith('//') && !line.startsWith('UMETA')) {
+			// Only match lines that look like valid enum values
+			const valueMatch = line.match(/^(\w+)(?:\s*=\s*(\d+))?\s*,?\s*$/);
+			if (valueMatch) {
 				values.push({
 					name: valueMatch[1],
 					value: valueMatch[2] ? parseInt(valueMatch[2]) : undefined,
@@ -466,8 +468,17 @@ export class UnrealDocGenerator {
 		}
 
 		// Extract category from metadata
+		let category: string | undefined;
 		const categoryMatch = specifiers.find(s => s.includes('Category'));
-		const category = categoryMatch ? categoryMatch.split('=')[1]?.replace(/"/g, '').trim() : undefined;
+		if (categoryMatch) {
+			const parts = categoryMatch.split('=');
+			if (parts.length > 1 && parts[1]) {
+				category = parts[1].replace(/"/g, '').trim();
+				if (!category) {
+					category = undefined;
+				}
+			}
+		}
 
 		return {
 			name: funcName,
@@ -507,7 +518,8 @@ export class UnrealDocGenerator {
 		}
 
 		// Extract property type and name
-		const propMatch = propLine.match(/([\w:<>]+(?:\s*[*&])?)\s+(\w+)\s*[;=]/);
+		// Update regex to handle array declarations
+		const propMatch = propLine.match(/([\w:<>]+(?:\s*[*&])?)\s+(\w+)(?:\[\d*\])?\s*[;={]/);
 		if (!propMatch) {
 			return null;
 		}
@@ -515,9 +527,18 @@ export class UnrealDocGenerator {
 		const propType = propMatch[1].trim();
 		const propName = propMatch[2].trim();
 
-		// Extract category from metadata
+		// Extract category from metadata with proper null checking
+		let category: string | undefined;
 		const categoryMatch = specifiers.find(s => s.includes('Category'));
-		const category = categoryMatch ? categoryMatch.split('=')[1]?.replace(/"/g, '').trim() : undefined;
+		if (categoryMatch) {
+			const parts = categoryMatch.split('=');
+			if (parts.length > 1 && parts[1]) {
+				category = parts[1].replace(/"/g, '').trim();
+				if (!category) {
+					category = undefined;
+				}
+			}
+		}
 
 		return {
 			name: propName,
@@ -544,8 +565,7 @@ export class UnrealDocGenerator {
 	): Promise<GeneratedDocumentation> {
 		const {
 			title = 'Unreal Engine Documentation',
-			includePrivate = false,
-			format = 'markdown',
+			// includePrivate option is reserved for future use
 		} = options;
 
 		let content = `# ${title}\n\n`;
@@ -556,7 +576,7 @@ export class UnrealDocGenerator {
 		if (metadata.classes.length > 0) {
 			content += `## Classes\n\n`;
 			for (const classData of metadata.classes) {
-				content += this.generateClassDocumentation(classData, includePrivate);
+				content += this.generateClassDocumentation(classData, false);
 			}
 		}
 
@@ -740,8 +760,7 @@ export class UnrealDocGenerator {
 		const {
 			format = 'mermaid',
 			includeInheritance = true,
-			includeDependencies = false,
-			maxDepth = 3,
+			// includeDependencies and maxDepth are reserved for future use
 			maxItemsPerClass = DEFAULT_MAX_ITEMS_IN_DIAGRAM,
 		} = options;
 
@@ -770,7 +789,7 @@ export class UnrealDocGenerator {
 					const visibility = func.blueprintCallable ? '+' : '-';
 					diagram += `        ${visibility}${func.name}()`;
 					if (func.returnType && func.returnType !== 'void') {
-						diagram += ` ${func.returnType}`;
+						diagram += ` : ${func.returnType}`;
 					}
 					diagram += '\n';
 				}
@@ -863,7 +882,8 @@ export class UnrealDocGenerator {
 			content += `// Create an instance (example)\n`;
 			if (metadata.classes.length > 0) {
 				const mainClass = metadata.classes[0];
-				content += `U${mainClass.name}* MyInstance = NewObject<U${mainClass.name}>(this);\n`;
+				// Use class name as-is since it already includes the prefix (U, A, F, etc.)
+				content += `${mainClass.name}* MyInstance = NewObject<${mainClass.name}>(this);\n`;
 				if (mainClass.functions && mainClass.functions.length > 0) {
 					const func = mainClass.functions[0];
 					content += `MyInstance->${func.name}(`;
