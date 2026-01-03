@@ -20,6 +20,12 @@ import {
 } from './types.js';
 
 /**
+ * Constants for documentation generation
+ */
+const UNREAL_MACROS = ['UCLASS', 'USTRUCT', 'UENUM', 'UFUNCTION', 'UPROPERTY'] as const;
+const DEFAULT_MAX_ITEMS_IN_DIAGRAM = 5;
+
+/**
  * Options for documentation generation
  */
 export interface DocGenerationOptions {
@@ -40,6 +46,7 @@ export interface DiagramOptions {
 	includeDependencies?: boolean;
 	includeComponents?: boolean;
 	maxDepth?: number;
+	maxItemsPerClass?: number;
 }
 
 /**
@@ -254,9 +261,8 @@ export class UnrealDocGenerator {
 			}
 
 			// Clear comment if we hit a non-comment, non-macro line
-			if (!line.startsWith('UCLASS') && !line.startsWith('USTRUCT') && 
-				!line.startsWith('UENUM') && !line.startsWith('UFUNCTION') && 
-				!line.startsWith('UPROPERTY')) {
+			const isUnrealMacro = UNREAL_MACROS.some(macro => line.startsWith(macro));
+			if (!isUnrealMacro) {
 				currentComment = [];
 			}
 		}
@@ -736,6 +742,7 @@ export class UnrealDocGenerator {
 			includeInheritance = true,
 			includeDependencies = false,
 			maxDepth = 3,
+			maxItemsPerClass = DEFAULT_MAX_ITEMS_IN_DIAGRAM,
 		} = options;
 
 		if (format !== 'mermaid') {
@@ -749,17 +756,17 @@ export class UnrealDocGenerator {
 		for (const classData of classes) {
 			diagram += `    class ${classData.name} {\n`;
 			
-			// Add properties
+			// Add properties (limited for readability)
 			if (classData.properties && classData.properties.length > 0) {
-				for (const prop of classData.properties.slice(0, 5)) { // Limit to 5 for readability
+				for (const prop of classData.properties.slice(0, maxItemsPerClass)) {
 					const visibility = prop.editAnywhere ? '+' : prop.blueprintReadOnly ? '#' : '-';
 					diagram += `        ${visibility}${prop.type} ${prop.name}\n`;
 				}
 			}
 
-			// Add functions
+			// Add functions (limited for readability)
 			if (classData.functions && classData.functions.length > 0) {
-				for (const func of classData.functions.slice(0, 5)) { // Limit to 5 for readability
+				for (const func of classData.functions.slice(0, maxItemsPerClass)) {
 					const visibility = func.blueprintCallable ? '+' : '-';
 					diagram += `        ${visibility}${func.name}()`;
 					if (func.returnType && func.returnType !== 'void') {

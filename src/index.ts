@@ -1654,6 +1654,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: "number",
               description: "Maximum depth for relationships. Default: 3",
             },
+            maxItemsPerClass: {
+              type: "number",
+              description: "Maximum number of properties/functions to show per class. Default: 5",
+            },
           },
           required: ["file_paths"],
         },
@@ -3071,6 +3075,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const includeInheritance = args.includeInheritance !== false;
       const includeDependencies = args.includeDependencies as boolean | undefined;
       const maxDepth = args.maxDepth as number | undefined;
+      const maxItemsPerClass = args.maxItemsPerClass as number | undefined;
       
       // Extract metadata from all files
       const allClasses: any[] = [];
@@ -3086,6 +3091,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         includeInheritance,
         includeDependencies,
         maxDepth,
+        maxItemsPerClass,
       };
       
       const diagram = docGen.generateSystemDiagram(allClasses, options);
