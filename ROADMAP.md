@@ -15,7 +15,7 @@
 **Next logical steps after completing Phase 3.1**
 
 #### Documentation & Context System (Phase 3.2)
-- [ ] **Smart Documentation Generation**
+- [x] **Smart Documentation Generation** ✅ COMPLETED
   - Auto-generate documentation from code and Blueprints
   - Extract comments and metadata
   - Create system diagrams
@@ -170,6 +170,13 @@
   - UClass, GameMode, Character, Component generation
   - Network replication code generation
   - Data asset and data table creation
+- **Phase 3.2 (✅ Completed):** Smart Documentation Generation
+  - 4 documentation generation tools
+  - Auto-generate docs from C++ code and Blueprints
+  - Extract comments, metadata, and API information
+  - Create Mermaid architecture diagrams
+  - Generate integration guides with setup instructions
+  - 1 new documentation resource
 - **UE5.6+ Knowledge Database (✅ Completed):**
   - Comprehensive information on 12+ core UE5.6+ systems
   - Searchable knowledge with tags and metadata
@@ -213,6 +220,12 @@
   - Create UClasses, GameModes, Characters, Components
   - Generate network replication code
   - Create data assets and data table structures
+- **Smart Documentation Generation:**
+  - Auto-generate comprehensive documentation from C++ code
+  - Extract comments, metadata, classes, functions, and properties
+  - Create system architecture diagrams in Mermaid format
+  - Generate integration guides with setup instructions
+  - Extract detailed code metadata for analysis
 - **UE5.6+ Knowledge Base:**
   - Query detailed information on core UE systems
   - Access best practices and implementation guides
@@ -226,6 +239,7 @@
 - Some Phase 2 Blueprint features require UE Editor to be running
 - Actor spawning and modification require Adastrea-Director connection
 - No automated testing infrastructure yet (Phase 3.3)
+- No pattern recognition and recommendations yet (Phase 3.2 continuation)
 - No multi-project workspace support yet (Phase 4.1)
 - No marketplace integration yet (Phase 4.2)
 
@@ -419,12 +433,31 @@
   - Tool: `extract_interface` - Create Blueprint/C++ interfaces
   - Tool: `refactor_to_component` - Extract functionality to components
 
-#### 3.2 Documentation & Context System
-- [ ] **Smart Documentation Generation**
+#### 3.2 Documentation & Context System ✅ PARTIALLY COMPLETED
+- [x] **Smart Documentation Generation** ✅ COMPLETED
   - Auto-generate documentation from code and Blueprints
   - Extract comments and metadata
   - Create system diagrams
   - Generate integration guides
+
+**Status:** ✅ Completed January 2026
+
+**Implemented Tools (4):**
+- `generate_documentation` - Generate comprehensive docs from C++ files
+- `extract_code_metadata` - Extract detailed metadata from code
+- `generate_system_diagram` - Create Mermaid architecture diagrams
+- `generate_integration_guide` - Create integration guides for systems
+
+**New Resource (1):**
+- `unreal://docs/systems` - Access generated documentation system
+
+**Key Features:**
+- 1000+ lines of documentation generation logic
+- Extracts comments, classes, functions, properties, enums, structs
+- Generates markdown documentation with proper formatting
+- Creates Mermaid diagrams showing class relationships
+- Integration guides with setup steps and code examples
+- Full TypeScript type safety
 
 - [ ] **Pattern Recognition & Recommendations**
   - Detect common UE design patterns in use
@@ -668,7 +701,7 @@ Together, they form a complete development ecosystem where:
 
 ## Tool Expansion Plan
 
-### Current Tools (37)
+### Current Tools (41)
 **Game Project Management (3):**
 - `update_game_info`
 - `get_game_info`
@@ -723,14 +756,11 @@ Together, they form a complete development ecosystem where:
 - `generate_data_asset`
 - `generate_data_table`
 
-**Phase 2.2 - Blueprint Interaction (7):**
-- `inspect_blueprint`
-- `search_blueprint_nodes`
-- `get_blueprint_variables`
-- `get_blueprint_functions`
-- `add_blueprint_variable`
-- `add_blueprint_function`
-- `modify_blueprint_property`
+**Phase 3.2 - Documentation Generation (4):** ✅
+- `generate_documentation`
+- `extract_code_metadata`
+- `generate_system_diagram`
+- `generate_integration_guide`
 
 ### Phase 1-2 Tools (Original Plan: +25, Actual: +18)
 **Project Management:**
@@ -981,6 +1011,19 @@ We welcome contributions from the Unreal Engine and MCP communities:
 | 2025-12-19 | 1.2 | Actor & Component System completed (Phase 2.3) - Added 7 new tools for actor management and templates, plus 1 new resource |
 | 2025-12-20 | 1.3 | Adastrea repository integration and documentation updates |
 | 2025-12-29 | 1.4 | Phase 3.1: Intelligent Code Generation completed - Added 8 code generation tools |
+| 2026-01-03 | 1.5 | Phase 3.2: Smart Documentation Generation completed - Added 4 documentation tools |
+
+**Details for v1.5 (2026-01-03)**
+- ✅ Completed Phase 3.2: Documentation & Context System (Smart Documentation Generation)
+- Added 4 new documentation generation tools
+- Tools: generate_documentation, extract_code_metadata, generate_system_diagram, generate_integration_guide
+- Created doc-generator.ts module (1000+ lines)
+- Extracts comments, metadata, classes, functions, properties, enums, and structs
+- Generates markdown documentation with proper formatting
+- Creates Mermaid diagrams showing class relationships and inheritance
+- Integration guides with setup steps, prerequisites, and code examples
+- New resource: unreal://docs/systems
+- Total tools now: 41 (up from 37)
 
 **Details for v1.4 (2025-12-29)**
 - ✅ Completed Phase 3.1: AI-Enhanced Development Tools (Intelligent Code Generation)
