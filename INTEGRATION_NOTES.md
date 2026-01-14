@@ -1,6 +1,6 @@
 # Adastrea-Director Integration Notes
 
-This document provides implementation notes for integrating Adastrea-MCP with the live Adastrea-Director REST API.
+This document provides implementation notes for integrating Adastrea-MCP with Adastrea-Director.
 
 ## Current Status
 
@@ -14,11 +14,88 @@ The Editor Communication Layer has been fully implemented with:
 - Graceful degradation and fallback logic
 - Comprehensive documentation and testing
 
-**Current Limitation**: The DirectorClient uses placeholder implementations for HTTP requests. These return disconnected status until the actual REST API endpoints are implemented.
+**Adastrea-Director Current State** (as of January 2026):
+- ✅ **P3 Complete**: Autonomous agents for performance profiling, bug detection, and code quality monitoring
+- ✅ **Built-in MCP Server**: 84+ tests, provides AI agent access to Unreal Engine (unreal_mcp_cli.py)
+- ✅ **UE Python API Integration**: 25+ tests for asset operations, actor management, editor automation
+- ✅ **Plugin Mode**: Weeks 1-6 complete (basic UI + RAG integration)
+- 🚀 **In Progress**: Plugin Weeks 7-16 (Planning agent integration and UI/UX improvements)
 
-## Next Steps for Full Integration
+## Architecture Overview
 
-### 1. Implement HTTP Client in DirectorClient
+```
+MCP Client (Claude, VS Code, 5ire, Cline)
+    ↓
+Adastrea-MCP Server (Node.js) [THIS PROJECT]
+    ├── Static Analysis (always available)
+    │   ├── .uproject parsing, C++ analysis
+    │   ├── Blueprint metadata extraction
+    │   ├── Code generation (8 tools)
+    │   └── UE5.6+ knowledge database
+    │
+    └── EditorBridge [IMPLEMENTED]
+         └── DirectorClient [AVAILABLE FOR INTEGRATION]
+              ↓ 
+              Integration Options:
+              
+              Option 1: Via Adastrea-Director MCP Server (Recommended)
+              ↓ MCP Protocol
+              Adastrea-Director MCP Server (Python)
+                   ├── UE Python API (unreal module)
+                   ├── Asset operations
+                   ├── Actor operations
+                   ├── Console commands
+                   └── Editor automation
+                        ↓
+                        Unreal Engine Editor
+              
+              Option 2: Via Director's Python Backend (If REST API is added)
+              ↓ HTTP/REST
+              Adastrea-Director Python Backend
+                   ↓ IPC
+                   UE C++ Plugin
+                        ↓
+                        Unreal Engine Editor
+```
+
+## Integration Approaches
+
+### Recommended: MCP-to-MCP Integration
+
+Since Adastrea-Director now has its own MCP server, the cleanest integration is **MCP-to-MCP**:
+
+1. **Client Configuration**: Configure MCP client to use both servers
+   ```json
+   {
+     "mcpServers": {
+       "adastrea-mcp": {
+         "command": "node",
+         "args": ["/path/to/Adastrea-MCP/build/index.js"]
+       },
+       "adastrea-director": {
+         "command": "python",
+         "args": ["/path/to/Adastrea-Director/mcp_server/server.py"]
+       }
+     }
+   }
+   ```
+
+2. **Benefits**:
+   - No HTTP layer needed
+   - Both servers work independently
+   - Clear separation of concerns
+   - Adastrea-MCP: Static analysis, code generation, knowledge
+   - Adastrea-Director: Runtime execution, autonomous agents, live editor
+
+3. **Use Cases**:
+   - Use Adastrea-MCP tools for code scaffolding and project analysis
+   - Use Adastrea-Director tools for live editor manipulation and monitoring
+
+### Alternative: REST API Integration
+
+If Adastrea-Director adds REST endpoints in the future, the existing DirectorClient can be activated:
+
+### REST API Integration (If Director Adds HTTP Endpoints)
 
 **File**: `src/director/client.ts`
 
@@ -47,7 +124,7 @@ private async request<T>(
 }
 ```
 
-### 2. Implement Health Check Endpoint
+### 2. Implement Health Check Endpoint (REST API Option)
 
 **File**: `src/director/client.ts`
 
@@ -79,9 +156,11 @@ async checkHealth(): Promise<DirectorHealthStatus> {
 }
 ```
 
-### 3. Required Adastrea-Director REST Endpoints
+### 3. Required REST Endpoints (If Director Implements HTTP API)
 
-The following REST endpoints need to be implemented in Adastrea-Director:
+The following REST endpoints would need to be implemented in Adastrea-Director if REST integration is desired:
+
+**Note**: This is optional as Director already provides an MCP server for runtime operations.
 
 #### Health Check
 - **Endpoint**: `GET /health`
@@ -179,7 +258,30 @@ The following REST endpoints need to be implemented in Adastrea-Director:
 
 ### 4. Testing Integration
 
-Once REST endpoints are available:
+**For MCP-to-MCP Integration** (Recommended):
+
+1. **Configure Both Servers**:
+   - Add both servers to your MCP client configuration
+   - Start Adastrea-Director: `python /path/to/Adastrea-Director/mcp_server/server.py`
+   - Start Adastrea-MCP: `node /path/to/Adastrea-MCP/build/index.js`
+
+2. **Test Static Analysis** (via Adastrea-MCP):
+   ```bash
+   # Use Adastrea-MCP tools
+   scan_unreal_project
+   generate_uclass
+   query_ue_knowledge
+   ```
+
+3. **Test Runtime Operations** (via Adastrea-Director):
+   ```bash
+   # Use Director's MCP tools (see Director's MCP_SERVER_GUIDE.md)
+   unreal_execute_python
+   unreal_list_assets
+   unreal_create_actor
+   ```
+
+**For REST API Integration** (if implemented):
 
 1. **Update Configuration**:
    ```bash
@@ -187,7 +289,7 @@ Once REST endpoints are available:
    ```
 
 2. **Start Services**:
-   - Start Adastrea-Director MCP server
+   - Start Adastrea-Director with REST API
    - Open UE project with Director plugin
    - Start Adastrea-MCP server
 
@@ -274,44 +376,86 @@ Adastrea-MCP Server (Node.js) [THIS PROJECT]
 - [x] Integration testing
 - [x] Security scanning
 
-### Pending (Requires Adastrea-Director REST API) ⏳
+### Current Integration Status ✅
+- [x] **Director MCP Server Available**: Adastrea-Director now has built-in MCP server (84+ tests)
+- [x] **UE Python API Integration**: Director provides direct Unreal Engine access
+- [x] **Autonomous Agents**: P3 complete with performance, bug detection, code quality monitoring
+- [x] **Recommended Approach**: MCP-to-MCP integration (both servers running independently)
+
+### Optional - REST API Integration ⏳
+If Adastrea-Director adds REST endpoints:
 - [ ] Implement actual HTTP client in DirectorClient
 - [ ] Implement health check endpoint call
-- [ ] Test with live Adastrea-Director server
+- [ ] Test with live REST API server
 - [ ] Verify all tool operations work end-to-end
 - [ ] Performance testing under load
 - [ ] Update documentation with real examples
 
 ## Benefits of Current Implementation
 
-Even without live Director connection, the implementation provides:
+The current implementation provides flexibility for multiple integration approaches:
 
-1. **Complete Infrastructure**: All classes and logic are in place
-2. **Type Safety**: Full TypeScript typing ensures correctness
-3. **Clear Contracts**: Interface definitions document expectations
-4. **Graceful Degradation**: System works fully in offline mode
-5. **Easy Integration**: Only needs REST endpoint implementation
-6. **Testability**: Can be tested independently
+1. **MCP-to-MCP Integration** (Recommended):
+   - Both servers run independently
+   - Clean separation of concerns
+   - No HTTP layer needed
+   - Use Director's MCP server for runtime operations
+   - Use Adastrea-MCP for static analysis and code generation
+
+2. **Infrastructure Ready for REST** (If Needed):
+   - All classes and logic are in place
+   - Type safety with full TypeScript typing
+   - Clear contracts through interface definitions
+   - Graceful degradation when Director unavailable
+   - Easy to activate REST client if endpoints added
+
+3. **Testability**: Can be tested independently
+4. **Graceful Degradation**: System works fully in offline mode with local analysis
+
+## Recommended Setup
+
+**For Most Users:**
+```json
+{
+  "mcpServers": {
+    "adastrea": {
+      "command": "node",
+      "args": ["/path/to/Adastrea-MCP/build/index.js"]
+    },
+    "adastrea-director": {
+      "command": "python",
+      "args": ["/path/to/Adastrea-Director/mcp_server/server.py"]
+    }
+  }
+}
+```
+
+**When to Use Each Server:**
+- **Adastrea-MCP**: Project analysis, code scaffolding, UE knowledge queries
+- **Adastrea-Director**: Live editor operations, Python execution, autonomous monitoring
 
 ## Future Enhancements
 
-Once basic REST integration works:
+Once Director's plugin integration is complete (Weeks 7-16):
 
-1. **WebSocket Support**: For real-time bidirectional communication
-2. **Event Subscriptions**: Subscribe to editor events
-3. **Batch Operations**: Execute multiple commands efficiently
-4. **State Caching**: Cache editor state for faster access
-5. **Connection Pooling**: Support multiple Director instances
+1. **Enhanced MCP Integration**: Direct communication between both MCP servers
+2. **Event Subscriptions**: Subscribe to Director's autonomous agent events
+3. **Shared Knowledge Base**: Cross-pollinate UE knowledge and project-specific learnings
+4. **Batch Operations**: Coordinate complex multi-step operations across both servers
+5. **State Synchronization**: Share project state between static analysis and live editor
+6. **WebSocket Support**: For real-time bidirectional communication (if REST API added)
 
 ## Support
 
 For questions about:
-- **This integration layer**: See `PHASE2_1_GUIDE.md`
+- **Adastrea-MCP Integration**: See `PHASE2_1_GUIDE.md` and this document
 - **Adastrea-Director**: See [Adastrea-Director repo](https://github.com/Mittenzx/Adastrea-Director)
-- **REST API design**: Coordinate between both projects
+- **Director's MCP Server**: See [MCP_SERVER_GUIDE.md](https://github.com/Mittenzx/Adastrea-Director/blob/main/mcp_server/MCP_SERVER_GUIDE.md) in Director repo
+- **UE Python API**: See [UE_PYTHON_API.md](https://github.com/Mittenzx/Adastrea-Director/blob/main/Plugins/AdastreaDirector/Documentation/features/UE_PYTHON_API.md)
 
 ---
 
-**Last Updated**: December 17, 2025  
-**Status**: Infrastructure Complete, Awaiting REST Endpoints  
-**Next Milestone**: Phase 2.2 Blueprint Interaction Tools
+**Last Updated**: January 14, 2026  
+**Status**: Infrastructure Complete, MCP-to-MCP Integration Recommended  
+**Director Status**: P3 Complete (Autonomous Agents), Plugin Weeks 7-16 In Progress  
+**Integration Model**: Dual MCP servers with complementary capabilities

@@ -46,7 +46,11 @@ The pre-populated data combined with live repository access ensures AI agents ha
 - **Project Validation**: Automated checks for common project structure issues
 
 ### Phase 2.1: Editor Communication Layer (✅ Completed)
-- **Adastrea-Director Integration**: Seamless connection to [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) plugin
+- **Adastrea-Director Integration**: Seamless connection to [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director) 
+  - Director is now a comprehensive UE plugin with autonomous agents (P3 complete)
+  - Includes built-in MCP server for AI agent access (84+ tests)
+  - UE Python API integration with 25+ tests
+  - Performance profiling, bug detection, and code quality monitoring
 - **Live Editor State**: Real-time access to UE Editor state and current level information
 - **Console Command Execution**: Run UE console commands remotely via MCP
 - **Python Script Execution**: Execute Python code in UE Editor's embedded interpreter
@@ -1153,16 +1157,42 @@ We're on a mission to build the world's best Unreal Engine MCP server! Our compr
 
 📋 **[View Full Roadmap](./ROADMAP.md)** for detailed plans, timelines, and contribution opportunities.
 
-### Integration with Adastrea-Director
+### Integration with Other MCP Servers
 
-Adastrea-MCP works seamlessly with [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director), a comprehensive Unreal Engine plugin that provides:
-- **C++ UE Editor Plugin** for live engine integration
-- **Python Backend** with IPC communication
-- **MCP Server** for remote execution and asset management
-- **RAG System** for intelligent document understanding
-- **Planning Agents** for autonomous task decomposition
+Adastrea-MCP can work alongside other MCP servers to provide comprehensive Unreal Engine development assistance.
 
-Together, Adastrea-MCP (static analysis and planning) and Adastrea-Director (runtime execution) form a complete AI-assisted game development ecosystem.
+#### Integration with Adastrea-Director
+
+Adastrea-MCP works seamlessly with [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director), a comprehensive AI-powered development assistant that provides:
+- **UE Editor Plugin** with dockable AI assistant panel (Weeks 1-6 complete)
+- **Autonomous Agents (P3 Complete)** for performance profiling, bug detection, and code quality monitoring
+- **UE Python API Integration** with 25+ tests for asset operations, actor management, and editor automation
+- **Built-in MCP Server** with 84+ tests for AI agent access to Unreal Engine
+- **RAG System** for intelligent documentation understanding
+- **Planning Agents** for autonomous task decomposition and goal analysis
+- **Python Backend** with LLM integration (Google Gemini, OpenAI)
+
+**Complementary Roles:**
+- **Adastrea-MCP**: Static analysis, code generation, UE5.6+ knowledge database (37 tools, 13 resources)
+- **Adastrea-Director**: Runtime execution, autonomous monitoring, AI-assisted planning, live editor integration
+
+Together, they form a complete AI-assisted game development ecosystem. Director's built-in MCP server handles runtime operations while Adastrea-MCP provides comprehensive static analysis and code scaffolding capabilities.
+
+**📖 Setup Guide**: See [DUAL_SERVER_GUIDE.md](./DUAL_SERVER_GUIDE.md) for detailed instructions on using both servers together.
+
+#### Integration with VibeUE
+
+Adastrea-MCP can be connected as an external MCP server to [VibeUE](https://github.com/kevinpbuckley/VibeUE), an AI-powered Unreal Engine plugin (UE 5.7+) that brings AI directly into the editor:
+- **In-Editor AI Chat**: Natural language control of Unreal Engine
+- **27 Built-in Tools**: Blueprint lifecycle, UMG widgets, materials, actors, Python, filesystem
+- **Real-time Manipulation**: Create/modify Blueprints, widgets, materials instantly
+- **External MCP Support**: Connect Adastrea-MCP via `vibeue.mcp.json` configuration
+
+**Complementary Roles:**
+- **Adastrea-MCP**: Offline analysis, C++ code generation, UE5.6+ knowledge, project validation
+- **VibeUE**: In-editor real-time Blueprint/widget creation, material management, actor spawning
+
+**📖 Setup Guide**: See [VIBEUE_INTEGRATION.md](./VIBEUE_INTEGRATION.md) for detailed integration instructions and workflows.
 
 ## Contributing
 
