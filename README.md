@@ -1174,6 +1174,8 @@ Adastrea-MCP works seamlessly with [Adastrea-Director](https://github.com/Mitten
 
 Together, they form a complete AI-assisted game development ecosystem. Director's built-in MCP server handles runtime operations while Adastrea-MCP provides comprehensive static analysis and code scaffolding capabilities.
 
+**📖 Setup Guide**: See [DUAL_SERVER_GUIDE.md](./DUAL_SERVER_GUIDE.md) for detailed instructions on using both servers together.
+
 ## Contributing
 
 We welcome contributions! Whether you're fixing bugs, adding features, improving documentation, or testing with your Unreal Engine projects, your help is valuable. Check out our [ROADMAP.md](./ROADMAP.md) to see where you can contribute.
