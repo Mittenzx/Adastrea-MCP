@@ -1,8 +1,16 @@
 /**
- * Client for communicating with Adastrea-Director MCP server
+ * Client for communicating with Adastrea-Director
  * 
- * This client manages the connection to the Adastrea-Director plugin's
- * MCP server, which provides real-time Unreal Engine Editor integration.
+ * CURRENT STATUS: Placeholder for optional REST API integration
+ * 
+ * RECOMMENDED APPROACH:
+ * - Use Adastrea-Director's MCP server directly (no HTTP bridge needed)
+ * - Configure both MCP servers in your MCP client
+ * - See INTEGRATION_NOTES.md for MCP-to-MCP setup
+ * 
+ * OPTIONAL FUTURE USE:
+ * If Adastrea-Director adds REST API endpoints, this client can be activated
+ * to provide HTTP-based communication as an alternative integration method.
  */
 
 import {
@@ -90,11 +98,19 @@ export class DirectorClient {
    * Check health of Director server
    * 
    * NOTE: This currently returns 'disconnected' as a placeholder.
-   * In production, this should make an HTTP request to Director's /health endpoint.
+   * 
+   * INTEGRATION OPTIONS:
+   * 1. RECOMMENDED: Use Adastrea-Director's MCP server directly (no HTTP needed)
+   *    - Configure both MCP servers in your MCP client
+   *    - Use Director's MCP tools for runtime operations
+   * 
+   * 2. OPTIONAL: If Director adds REST API in the future, implement HTTP client here
+   *    - Uncomment the example implementation below
+   *    - Connect to Director's REST endpoints
    */
   async checkHealth(): Promise<DirectorHealthStatus> {
     try {
-      // TODO: Implement actual health check when Director REST API is available
+      // OPTIONAL: Implement HTTP health check if Director adds REST API
       // Example implementation:
       // const response = await fetch(`${this.config.baseUrl}/health`, {
       //   signal: AbortSignal.timeout(this.config.timeout),
@@ -108,7 +124,7 @@ export class DirectorClient {
       //   capabilities: data.capabilities,
       // };
       
-      // For now, return disconnected status (Director not running)
+      // For now, return disconnected status (use Director's MCP server instead)
       return {
         status: 'disconnected',
         editorConnected: false,
@@ -240,9 +256,14 @@ export class DirectorClient {
   /**
    * Make a request to Director server
    * 
-   * NOTE: This is a placeholder implementation. In production, this should
-   * use a proper HTTP client (fetch/axios) to make requests to the Director MCP server.
-   * The Director server should expose REST endpoints at the configured baseUrl.
+   * NOTE: This is a placeholder for optional REST API integration.
+   * 
+   * RECOMMENDED APPROACH: Use Adastrea-Director's MCP server directly instead.
+   * - Configure both MCP servers in your MCP client
+   * - Use Director's MCP tools: unreal_execute_python, unreal_list_assets, etc.
+   * - See Director's MCP_SERVER_GUIDE.md for available tools
+   * 
+   * OPTIONAL: If Director adds REST API endpoints in the future, implement HTTP client here.
    */
   private async request<T>(
     endpoint: string,
@@ -251,7 +272,7 @@ export class DirectorClient {
       body?: Record<string, unknown>;
     }
   ): Promise<DirectorResponse<T>> {
-    // TODO: Implement actual HTTP client when Director REST API is available
+    // OPTIONAL: Implement HTTP client if Director adds REST API
     // Example implementation:
     // const response = await fetch(`${this.config.baseUrl}${endpoint}`, {
     //   method: options?.method || 'GET',
@@ -263,7 +284,7 @@ export class DirectorClient {
     
     return {
       success: false,
-      error: 'Director not connected - HTTP client not yet implemented. This is a placeholder for future REST API integration.',
+      error: 'Director HTTP integration not implemented. Use Director\'s MCP server for runtime operations.',
     };
   }
 

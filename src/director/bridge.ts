@@ -1,11 +1,21 @@
 /**
  * Editor Bridge - Coordinates between Adastrea-MCP and Adastrea-Director
  * 
- * This bridge manages:
- * - Tool delegation (local static analysis vs remote live execution)
- * - State synchronization between MCP server and UE Editor
- * - Graceful degradation when Director is unavailable
- * - Resource routing
+ * CURRENT STATUS: Infrastructure for optional REST API integration
+ * 
+ * This bridge provides:
+ * - Tool delegation framework (local static analysis vs remote live execution)
+ * - Graceful degradation when Director REST API unavailable
+ * - State synchronization capabilities
+ * 
+ * RECOMMENDED APPROACH:
+ * Use Adastrea-Director's MCP server directly instead of this bridge.
+ * Both servers work independently with complementary tool sets.
+ * 
+ * OPTIONAL FUTURE USE:
+ * If Director adds REST API, this bridge can coordinate between:
+ * - Adastrea-MCP: Static analysis, code generation
+ * - Director REST API: Runtime execution, live editor access
  */
 
 import { DirectorClient } from './client.js';
