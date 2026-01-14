@@ -1157,7 +1157,11 @@ We're on a mission to build the world's best Unreal Engine MCP server! Our compr
 
 📋 **[View Full Roadmap](./ROADMAP.md)** for detailed plans, timelines, and contribution opportunities.
 
-### Integration with Adastrea-Director
+### Integration with Other MCP Servers
+
+Adastrea-MCP can work alongside other MCP servers to provide comprehensive Unreal Engine development assistance.
+
+#### Integration with Adastrea-Director
 
 Adastrea-MCP works seamlessly with [Adastrea-Director](https://github.com/Mittenzx/Adastrea-Director), a comprehensive AI-powered development assistant that provides:
 - **UE Editor Plugin** with dockable AI assistant panel (Weeks 1-6 complete)
@@ -1175,6 +1179,20 @@ Adastrea-MCP works seamlessly with [Adastrea-Director](https://github.com/Mitten
 Together, they form a complete AI-assisted game development ecosystem. Director's built-in MCP server handles runtime operations while Adastrea-MCP provides comprehensive static analysis and code scaffolding capabilities.
 
 **📖 Setup Guide**: See [DUAL_SERVER_GUIDE.md](./DUAL_SERVER_GUIDE.md) for detailed instructions on using both servers together.
+
+#### Integration with VibeUE
+
+Adastrea-MCP can be connected as an external MCP server to [VibeUE](https://github.com/kevinpbuckley/VibeUE), an AI-powered Unreal Engine plugin (UE 5.7+) that brings AI directly into the editor:
+- **In-Editor AI Chat**: Natural language control of Unreal Engine
+- **27 Built-in Tools**: Blueprint lifecycle, UMG widgets, materials, actors, Python, filesystem
+- **Real-time Manipulation**: Create/modify Blueprints, widgets, materials instantly
+- **External MCP Support**: Connect Adastrea-MCP via `vibeue.mcp.json` configuration
+
+**Complementary Roles:**
+- **Adastrea-MCP**: Offline analysis, C++ code generation, UE5.6+ knowledge, project validation
+- **VibeUE**: In-editor real-time Blueprint/widget creation, material management, actor spawning
+
+**📖 Setup Guide**: See [VIBEUE_INTEGRATION.md](./VIBEUE_INTEGRATION.md) for detailed integration instructions and workflows.
 
 ## Contributing
 
