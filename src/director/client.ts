@@ -284,7 +284,7 @@ export class DirectorClient {
     
     return {
       success: false,
-      error: 'Director HTTP integration not implemented. Use Director\'s MCP server for runtime operations.',
+      error: `Director HTTP integration not implemented. Use Director's MCP server for runtime operations.`,
     };
   }
 
