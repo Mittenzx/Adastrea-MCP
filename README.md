@@ -1178,7 +1178,7 @@ Adastrea-MCP works seamlessly with [Adastrea-Director](https://github.com/Mitten
 
 Together, they form a complete AI-assisted game development ecosystem. Director's built-in MCP server handles runtime operations while Adastrea-MCP provides comprehensive static analysis and code scaffolding capabilities.
 
-**📖 Setup Guide**: See [DUAL_SERVER_GUIDE.md](./DUAL_SERVER_GUIDE.md) for detailed instructions on using both servers together.
+**📖 Setup Guide**: See [docs/guides/DUAL_SERVER_GUIDE.md](./docs/guides/DUAL_SERVER_GUIDE.md) for detailed instructions on using both servers together.
 
 #### Integration with VibeUE
 
@@ -1192,7 +1192,7 @@ Adastrea-MCP can be connected as an external MCP server to [VibeUE](https://gith
 - **Adastrea-MCP**: Offline analysis, C++ code generation, UE5.6+ knowledge, project validation
 - **VibeUE**: In-editor real-time Blueprint/widget creation, material management, actor spawning
 
-**📖 Setup Guide**: See [VIBEUE_INTEGRATION.md](./VIBEUE_INTEGRATION.md) for detailed integration instructions and workflows.
+**📖 Setup Guide**: See [docs/integration/VIBEUE_INTEGRATION.md](./docs/integration/VIBEUE_INTEGRATION.md) for detailed integration instructions and workflows.
 
 ## Contributing
 
