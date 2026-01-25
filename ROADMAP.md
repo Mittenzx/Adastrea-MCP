@@ -11,8 +11,8 @@
 
 ## 🎯 TODO - What's Not Done Yet
 
-### 🔥 Immediate Priority (Phase 3.2 & 3.3)
-**Next logical steps after completing Phase 3.1**
+### 🔥 Immediate Priority (Phase 3.2 continuation & 3.3 - Q1 2026)
+**Next logical steps after completing Phase 3.1 & 3.2**
 
 #### Documentation & Context System (Phase 3.2)
 - [x] **Smart Documentation Generation** ✅ COMPLETED
@@ -47,7 +47,7 @@
 
 ---
 
-### 📅 Near-term Priority (Phase 4 - Q4 2026)
+### 📅 Near-term Priority (Phase 4 - Q2-Q3 2026)
 **Advanced Features & Ecosystem**
 
 #### Multi-Project Support (Phase 4.1)
@@ -90,7 +90,7 @@
 
 ---
 
-### 🔮 Long-term Priority (Phase 5 - Q1 2027)
+### 🔮 Long-term Priority (Phase 5 - Q4 2026-Q1 2027)
 **Intelligence & Automation**
 
 #### Semantic Code Understanding (Phase 5.1)
@@ -480,7 +480,7 @@
 
 ---
 
-### Phase 4: Advanced Features & Ecosystem (Q4 2026)
+### Phase 4: Advanced Features & Ecosystem (Q2-Q3 2026)
 **Goal:** Build a comprehensive ecosystem around Unreal Engine MCP
 
 #### 4.1 Multi-Project Support
@@ -523,7 +523,7 @@
 
 ---
 
-### Phase 5: Intelligence & Automation (Q1 2027)
+### Phase 5: Intelligence & Automation (Q4 2026-Q1 2027)
 **Goal:** Leverage AI to provide unprecedented development assistance
 
 #### 5.1 Semantic Code Understanding
@@ -1012,6 +1012,17 @@ We welcome contributions from the Unreal Engine and MCP communities:
 | 2025-12-20 | 1.3 | Adastrea repository integration and documentation updates |
 | 2025-12-29 | 1.4 | Phase 3.1: Intelligent Code Generation completed - Added 8 code generation tools |
 | 2026-01-03 | 1.5 | Phase 3.2: Smart Documentation Generation completed - Added 4 documentation tools |
+| 2026-01-25 | 1.6 | Documentation reorganization - Moved all docs into docs/ folder with subfolders (guides, summaries, analysis, integration) |
+
+**Details for v1.6 (2026-01-25)**
+- 📁 Reorganized documentation structure for better maintainability
+- Created docs/ folder with organized subfolders:
+  - docs/guides/ - Implementation guides (Phase guides, dual server guide)
+  - docs/summaries/ - Completion summaries and status reports
+  - docs/analysis/ - Feasibility studies and research documents
+  - docs/integration/ - Integration notes and implementation details
+- Kept core documentation in root (README, ROADMAP, CONTRIBUTING, QUICKSTART)
+- Total: 20 documentation files organized into logical categories
 
 **Details for v1.5 (2026-01-03)**
 - ✅ Completed Phase 3.2: Documentation & Context System (Smart Documentation Generation)
@@ -1040,7 +1051,7 @@ We welcome contributions from the Unreal Engine and MCP communities:
 - Updated Adastrea project status (code 85% complete; content 10% complete; 22+ systems; 33,000+ C++ lines)
 - Linked comprehensive documentation references for systems and guides
 
-**Next Review Date:** 2026-01-15
+**Next Review Date:** 2026-02-28
 
 **Maintained by:** Adastrea-MCP Development Team
 **Contact:** https://github.com/Mittenzx/Adastrea-MCP
