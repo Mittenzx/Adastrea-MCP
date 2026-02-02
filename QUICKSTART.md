@@ -47,6 +47,37 @@ The build will run automatically during installation.
 
 See `mcp-config-example.json` for a template configuration.
 
+## Running the Server
+
+### Through MCP Clients (Primary Usage)
+
+The server runs **automatically** when accessed by your MCP client (Claude Desktop, Cline, etc.). You don't need to manually start it - the client launches it on demand using the configuration you set up above.
+
+When Claude Desktop or another MCP client needs the server:
+1. The client executes: `node /path/to/Adastrea-MCP/build/index.js`
+2. The server starts and communicates via stdio (standard input/output)
+3. The server remains running as long as the client needs it
+4. The server automatically shuts down when the client disconnects
+
+**You don't need to run any commands manually for normal usage.**
+
+### Standalone Testing (Optional)
+
+For development or testing purposes, you can run the server directly:
+
+```bash
+node build/index.js
+```
+
+This starts the server in stdio mode. It will wait for JSON-RPC messages on stdin and respond on stdout. This is typically only useful for:
+- Debugging the server
+- Testing with custom MCP client implementations
+- Development purposes
+
+**Note:** Running standalone requires manual JSON-RPC communication. For normal usage, always use an MCP client like Claude Desktop.
+
+For automated testing, see `src/test-server.ts` which provides a test harness.
+
 ## First Steps
 
 Once configured, you can start using the MCP server through your AI assistant:
